@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project.tripMaker.dao.CityDao">
+    <resultMap id="StateResultMap" type="State">
+        <id column="state_code" property="stateCode"/>
+        <result column="state_name" property="stateName"/>
+        <result column="state_tour" property="stateTour"/>
+    </resultMap>
+
+    <resultMap id="CityResultMap" type="City">
+        <id column="city_code" property="cityCode"/>
+        <result column="city_name" property="cityName"/>
+        <result column="city_tour" property="cityTour"/>
+        <result column="city_photo" property="cityPhoto"/>
+        <association property="state" javaType="state">
+            <id column="state_code" property="stateCode"/>
+            <result column="state_name" property="stateName"/>
+            <result column="state_tour" property="stateTour"/>
+        </association>
+    </resultMap>
+
+    <select id="stateList" resultMap="StateResultMap">
+        select
+            state_code,
+            state_name,
+            state_tour
+        from
+            state
+    </select>
+
+    <select id="cityList" resultMap="CityResultMap">
+        SELECT
+            c.city_code,
+            c.city_name,
+            c.city_photo,
+            s.state_code,
+            s.state_name
+        FROM
+            city c
+                right JOIN state s
+                           ON s.state_code = c.state_code
+        where
+            s.state_code=#{stateCode}
+    </select>
+
+    <select id="findCity" resultMap="CityResultMap">
+        SELECT
+            c.city_code,
+            c.city_name,
+            c.city_tour,
+            c.city_photo,
+            s.state_code,
+            s.state_name,
+            state_tour
+        FROM
+            city c
+                right JOIN state s
+                           ON s.state_code = c.state_code
+        where
+            c.city_code=#{cityCode}
+    </select>
+
+    <select id="findState" resultMap="StateResultMap">
+        SELECT
+            s.state_code,
+            s.state_name,
+            s.state_tour
+        FROM
+            state s
+                right JOIN city c
+                           ON s.state_code = c.state_code
+        where
+            c.city_code=#{cityCode}
+    </select>
+
+</mapper>
