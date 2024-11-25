@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<head data-th-replace="~{header :: head}"></head>
+<link rel="stylesheet" href="/css/profile.css">
+<body>
+<header data-th-replace="~{header :: #page-header}"></header>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">회원정보 수정</h3>
+                </div>
+
+                <div class="card-body">
+                    <div data-th-if="${errorMessage}" class="alert alert-danger" role="alert" data-th-text="${errorMessage}"></div>
+                    <div data-th-if="${successMessage}" class="alert alert-success" role="alert" data-th-text="${successMessage}"></div>
+                    <div data-th-unless="${user}">
+                        <p class="alert alert-danger">존재하지 않는 회원입니다.</p>
+                    </div>
+
+                    <div data-th-if="${user}" data-th-object="${user}">
+                        <form enctype="multipart/form-data" method="post"
+                              data-th-action="@{/user/profile/{userNo}(userNo=${user.userNo})}"
+                              onsubmit="return validateForm()">
+
+                            <div class="text-center mb-4">
+                                <div class="position-relative d-inline-block">
+                                    <img data-th-src="@{https://dgg7dnk35523.edge.naverncp.com/HZiW9aEJy7/user/profile/} + *{userPhoto == null ? 'default.png' : userPhoto} + '?type=f&w=100&h=100'"
+                                         class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                    <div class="mt-2">
+                                        <label for="file" class="btn btn-outline-primary btn-sm">프로필 이미지 변경</label>
+                                        <input id="file" name="file" type="file" accept="image/*" style="display: none;"
+                                               onchange="previewImage(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">이메일</label>
+                                <input data-th-value="*{userEmail}" name="userEmail" type="email"
+                                       class="form-control" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">닉네임</label>
+                                <div class="input-group">
+                                    <input data-th-value="*{userNickname}" name="userNickname"
+                                           type="text" class="form-control" required id="userNickname">
+                                    <div class="invalid-feedback">
+                                        이미 사용중인 닉네임입니다.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-th-if="${user.snsNo == null}" class="mb-3">
+                                <label class="form-label">현재 비밀번호</label>
+                                <div class="input-group">
+                                    <input type="password" name="currentPassword" class="form-control" required>
+                                    <button data-th-if="${user.snsNo == null}" type="button" class="btn btn-secondary" onclick="openPasswordModal()">비밀번호 변경</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">연락처</label>
+                                <div class="input-group">
+                                    <input data-th-value="*{userTel}" name="userTel" type="tel"
+                                           class="form-control" readonly>
+                                    <button type="button" class="btn btn-secondary" id="changePhoneBtn">
+                                        연락처 변경
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="button-group mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">회원정보수정</button>
+                                <div class="d-flex justify-content-between gap-2">
+                                    <button type="reset" class="btn btn-secondary flex-grow-1">취소</button>
+                                    <button type="button" class="btn btn-danger flex-grow-1" onclick="deleteAccount()">회원탈퇴</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="passwordChangeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">비밀번호 변경</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="passwordChangeForm">
+                    <div class="mb-3">
+                        <label for="currentPasswordModal" class="form-label">현재 비밀번호</label>
+                        <input type="password" class="form-control" id="currentPasswordModal" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">새 비밀번호</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmNewPassword" class="form-label">새 비밀번호 확인</label>
+                        <input type="password" class="form-control" id="confirmNewPassword" required>
+                    </div>
+                    <div class="d-flex justify-content-end">  <!-- 여기를 수정 -->
+                        <button type="submit" class="btn btn-primary" style="width: 120px;">변경</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="changePhoneModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">전화번호 변경</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <div class="input-group">
+                        <input type="tel" class="form-control" id="newPhoneNumber"
+                               placeholder="010-0000-0000" pattern="[0-9]{3}-[0-9]{4}-[0-9]{4}">
+                        <button type="button" class="btn btn-primary" id="sendSmsBtn">
+                            인증번호 전송
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-3" id="smsVerificationDiv" style="display: none;">
+                    <div class="input-group">
+                        <input type="text" id="smsVerificationCode" class="form-control"
+                               placeholder="인증번호를 입력하세요" maxlength="6">
+                        <button type="button" class="btn btn-primary" id="verifyCodeBtn">
+                            확인
+                        </button>
+                    </div>
+                    <div id="smsTimer" class="text-danger mt-1"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary w-100" id="updatePhoneBtn" disabled>
+                    변경하기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/profile.js"></script>
+</body>
+</html>

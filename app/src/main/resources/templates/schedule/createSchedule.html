@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=0zojwabqn9&submodules=geocoder"
+            type="text/javascript"></script>
+    <script src="/js/mapUtils.js"></script>
+    <script src="/js/creatSchedule.js"></script>
+    <script src="/js/schedule/backToHome.js"></script>
+
+    <title>Document</title>
+    <style>
+        #drag-handle {
+            cursor: ew-resize;
+            width: 10px;
+            height: 100%;
+        }
+
+        .column-item {
+            flex: 0 0 300px;
+            min-width: 300px;
+            padding: 8px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="d-flex" style="width: 100%; height: 100vh;">
+    <!-- 왼쪽 리스트 부분 -->
+    <nav class="p-2 text-center "
+         style="width: 100px; flex: 0 0 100px;">
+        <div>
+            <h4 class="text-dark text-center">
+                <a href="#" class="text-decoration-none text-dark" id="homeLink">모두의<br>여행</a>
+            </h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <button class="btn w-100 text-center border-0">전체 일정</button>
+                </li>
+                <li class="nav-item" data-th-each="i : ${#numbers.sequence(0, trip.totalDay)}">
+                    <button class="btn w-100 text-center border-0" data-th-text="'Day ' + ${i+1}">전체 일정</button>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex mb-4">
+            <div class="d-flex flex-column align-items-center mt-4">
+                <div class="mb-2">
+                    <button class="btn btn-primary btn-sm" data-bs-target="#editModal" data-bs-toggle="modal" type="button">
+                        일정 편집
+                    </button>
+                </div>
+                <div>
+                    <button class="btn btn-primary btn-sm" id="nextPageBtn" type="button">다음</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="homeModal" tabindex="-1" aria-labelledby="homeModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="homeModalLabel">알림</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        홈으로 가면 일정이 초기화됩니다.
+                        계속하시겠습니까?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" id="confirmHomeBtn">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 왼쪽 패널 -->
+    <div class="bg-white h-100 d-flex flex-column" id="left-panel">
+        <div class="flex-column p-3">
+            <p class="fs-4 fw-bold mb-1" data-th-text="${trip.city.state.stateName} + ${trip.city.cityName}">제주도</p>
+            <p class="text-secondary mb-1" data-th-text="${trip.startDate} +' ~ '+  ${trip.endDate}">2024-01-01 ~ 2024-02-01</p>
+        </div>
+
+        <!-- 전체 수직 스크롤을 위한 컨테이너 -->
+        <div class="overflow-auto flex-grow-1">
+            <div class="d-flex flex-nowrap" id="columns-container">
+                <!-- Day 컬럼 -->
+                <div class="column-item text-dark p-1"
+                     data-th-id="'day-column-'+${entry.key}"
+                     style="width: 300px; min-width: 300px;"
+                     data-th-each="entry : ${groupedSchedules}">
+                    <div class="fw-bold mb-2" data-th-text="'Day ' + ${entry.key}">Day 1
+                    </div>
+                        <!-- 드래그 앤 드롭을 위한 전용 컨테이너 - each 밖으로 이동 -->
+                    <div class="schedule-container d-flex flex-column gap-1">
+                        <!-- 각 스케줄 반복 -->
+                        <th:block th:each="schedule, iterStat : ${entry.value}">
+                            <!-- 위치 카드 (드래그 가능) -->
+                            <div class="card border-0" id="locationCard"
+                                 style="width: 100%; height: 100px; position: relative;">
+                                <div class="d-flex align-items-start gap-1 mt-1" style="height: 100%;">
+                                    <div class="position-relative d-flex flex-column align-items-center"
+                                         style="height: 100%;">
+                                        <div class="m-2 d-flex justify-content-center align-items-center rounded-circle text-white"
+                                             data-th-text="${schedule.scheduleRoute}"
+                                             style="width: 20px; height: 20px; font-size: 10px;">
+                                        </div>
+                                        <div class="position-absolute"
+                                             style="width: 2px; height: calc(100% - 20px); top: 30px; left: 50%; transform: translateX(-50%);">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-start mt-2">
+                                        <p class="mb-0 bg-info rounded text-white p-1" style="font-size: 12px;">관광명소</p>
+                                        <p class="fs-6 fw-bold mb-0" th:text="${schedule.location.locationName}">
+                                            관광지이름</p>
+                                    </div>
+                                    <img alt="Location Image" class="rounded me-3 h-100 ms-auto"
+                                         src="image/default.png" style="width: 60px; object-fit: cover;"
+                                         th:src="${schedule.location.locationPhoto}">
+                                    <span class="day d-none" th:text="${schedule.scheduleDay}"></span>
+                                    <span class="route d-none" th:text="${schedule.scheduleRoute}"></span>
+                                    <span class="schedule-no d-none" th:text="${schedule.scheduleNo}"></span>
+                                    <span class="location-x d-none" th:text="${schedule.location.locationX}"></span>
+                                    <span class="location-y d-none" th:text="${schedule.location.locationY}"></span>
+                                </div>
+                            </div>
+
+                            <div th:if="${!iterStat.last}" class="card border-0" id="timeCard"  style="height: 40px; position: relative;">
+                                <div class="d-flex align-items-start mt-0" style="height: 100%;">
+                                    <div class="mt-1 position-relative d-flex flex-column align-items-center" id="carBar" style="height: 100%; width: 36px">
+                                        <div class="d-flex align-items-center" style="width: 2px; height: 35px; font-size: 10px;">
+                                        </div>
+                                    </div>
+                                    <div class="position-relative d-flex align-items-center justify-content-center" style="height: 100%;">
+                                        <i class="ps-10 bi bi-car-front-fill fs-6" id="carIcon"></i>
+                                    </div>
+                                    <p class="p-2 duration" id="duration">45minute</p>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 조정 핸들러 -->
+    <div class="position-relative bg-white" id="drag-handle">
+        <div>
+            <i class="bi bi-arrows-expand-vertical" id="drag-button"></i>
+        </div>
+
+        <div class="container border rounded-end bg-white d-flex justify-content-center align-items-center position-absolute start-100">
+            <i class="bi bi-arrow-bar-right m-0" id="expend" style="z-index: 1;"></i>
+        </div>
+    </div>
+
+    <!-- 오른쪽 콘텐츠 부분 -->
+    <div class="flex-grow-1 p-3" id="map" style="height: 100vh;"></div>
+
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="min-width: 80%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">일정 편집</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- 스크롤 가능한 컨테이너 추가 -->
+                    <div class="overflow-auto" style="max-width: 100%;">
+                        <div id="modalContent" class="p-3" style="min-width: min-content;">
+                            <!-- 컬럼 컨테이너가 여기에 복사됨 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary" id="saveButton">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="completionModalLabel" class="modal fade" id="completionModal"
+         tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="completionModalLabel">저장 완료</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>일정이 성공적으로 저장되었습니다!</p>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" href="/home">홈으로</a>
+                        <a class="btn btn-secondary" href="/mypage">마이페이지</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script data-th-inline="javascript">
+    const leftPanel = document.getElementById('left-panel');
+    const rightPanel = document.getElementById('map');
+    const columnsContainer = document.getElementById('columns-container');
+    const dragHandle = document.getElementById('drag-handle');
+    let isDragging = false;
+    const columnWidth = '300';
+    // 패널의 초기 너비 설정
+    let isExpanded = false;  // 상태 추적 변수
+
+    const distances = /*[[${distances}]]*/ '';
+    const scheduleKeyMap = /*[[${scheduleKeyMap}]]*/ {};
+
+    // 모든 일정 버튼들과 컬럼들을 가져옵니다
+    const dayButtons = document.querySelectorAll('.nav-item button');
+    const allColumns = document.querySelectorAll('.column-item');
+    const allScheduleBtn = document.querySelector('.nav-item:first-child button');
+
+    // 각 일정 버튼에 클릭 이벤트를 추가합니다
+    dayButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const buttonText = this.textContent.trim();
+
+            // 먼저 모든 버튼의 활성화 스타일을 제거
+            dayButtons.forEach(btn => {
+                btn.classList.remove('active', 'bg-primary', 'text-primary', 'fw-bold');
+                btn.classList.add('text-dark'); // 기본 텍스트 색상
+            });
+
+            // 클릭된 버튼에 활성화 스타일 추가
+            this.classList.add('active', 'text-primary', 'fw-bold');
+            this.classList.remove('text-dark');
+
+            if (buttonText === '전체 일정') {
+                // 전체 일정 버튼을 클릭한 경우
+                allColumns.forEach(column => {
+                    column.style.display = 'block';
+                });
+                leftPanel.style.width = calculateMaxWidth();
+                rightPanel.style.width = `calc(100% - ${parseInt(calculateMaxWidth()) + 110}px)`;
+                columnsContainer.classList.add('flex-nowrap');
+                columnsContainer.classList.remove('flex-wrap');
+                pinMarker();
+            } else {
+                // Day 버튼을 클릭한 경우
+                const dayNumber = parseInt(buttonText.replace('Day ', ''));
+
+                // 모든 컬럼을 숨기고
+                allColumns.forEach(column => {
+                    column.style.display = 'none';
+                });
+
+                // 선택된 Day의 컬럼만 보이게 함
+                const selectedColumn = document.getElementById(`day-column-${dayNumber}`);
+                if (selectedColumn) {
+                    selectedColumn.style.display = 'block';
+                    pinMarker([selectedColumn.querySelector('.schedule-container')]);
+                }
+
+                // 패널 너비를 300px로 조정
+                leftPanel.style.width = '300px';
+                rightPanel.style.width = `calc(100% - 410px)`; // 300px + 왼쪽 리스트 100px + drag-handle 10px
+                columnsContainer.classList.add('flex-wrap');
+                columnsContainer.classList.remove('flex-nowrap');
+            }
+            if (map) {
+                map.setSize(rightPanel.getBoundingClientRect());
+            }
+        });
+    });
+    // 페이지 로드 시 전체 일정 버튼을 활성화 상태로 설정
+    document.addEventListener('DOMContentLoaded', () => {
+        const allScheduleBtn = document.querySelector('.nav-item:first-child button');
+        if (allScheduleBtn) {
+            allScheduleBtn.classList.add('active', 'text-primary', 'fw-bold');
+            allScheduleBtn.classList.remove('text-dark');
+        }
+    });
+
+    function calculateMaxWidth() {
+        let columnCount = columnsContainer.children.length;
+        if (columnCount >= 3) {
+            columnCount = 3;
+        }
+        return (columnCount * columnWidth) + `px`;
+    }
+
+    // 컬럼 수에 따라 leftPanel의 너비를 조정하는 함수
+    function adjustPanelWidth() {
+        const columnCount = columnsContainer.children.length;
+        if (columnCount === 1) {
+            leftPanel.style.width = calculateMaxWidth();
+            rightPanel.style.width = `calc(100% - 410px)`; // 300px + 왼쪽 리스트 100px + drag-handle 5px
+            columnsContainer.classList.add('flex-wrap');
+            columnsContainer.classList.remove('flex-nowrap');
+        } else if (columnCount === 2) {
+            leftPanel.style.width = calculateMaxWidth();
+            rightPanel.style.width = `calc(100% - 710px)`; // 600px + 왼쪽 리스트 100px + drag-handle 5px
+            columnsContainer.classList.add('flex-nowrap');
+            columnsContainer.classList.remove('flex-wrap');
+        } else {
+            leftPanel.style.width = calculateMaxWidth();
+            rightPanel.style.width = `calc(100% - 1010px)`; // 900px + 왼쪽 리스트 100px + drag-handle 5px
+            columnsContainer.classList.add('flex-nowrap');
+            columnsContainer.classList.remove('flex-wrap');
+        }
+    }
+
+    // 마우스 다운 이벤트
+    dragHandle.addEventListener('mousedown', () => {
+        isDragging = true;
+        document.body.style.cursor = 'ew-resize';
+    });
+
+    // 마우스 움직임 이벤트 (드래그 중에 패널 너비 조정)
+    document.addEventListener('mousemove', (e) => {
+
+        if (isDragging) {
+            const newWidth = e.clientX - leftPanel.getBoundingClientRect().left;
+            if (newWidth <= 900) {
+                leftPanel.style.width = columnWidth + 'px';
+                rightPanel.style.width = `calc(100% - 410px)`;
+                columnsContainer.classList.add('flex-wrap');
+                columnsContainer.classList.remove('flex-nowrap');
+                isExpanded = false;
+            } else if (newWidth > 300) {
+                leftPanel.style.width = calculateMaxWidth();
+                rightPanel.style.width = `calc(100% - 1010px)`;
+                columnsContainer.classList.add('flex-nowrap');
+                columnsContainer.classList.remove('flex-wrap');
+                isExpanded = true;
+            }
+
+            if (map) {
+                map.setSize(rightPanel.getBoundingClientRect());
+            }
+        }
+    });
+
+    dragHandle.addEventListener('click', () => {
+        if (isExpanded) {
+            // 패널이 확장되어 있을 때 축소
+            leftPanel.style.width = '300px';
+            rightPanel.style.width = `calc(100% - 405px)`;  // 300px + left list 100px + drag handle 5px
+            columnsContainer.classList.add('flex-wrap');
+            columnsContainer.classList.remove('flex-nowrap');
+            isDragging = false;
+        } else {
+            // 패널이 축소되어 있을 때 확장
+            leftPanel.style.width = calculateMaxWidth();
+            rightPanel.style.width = `calc(100% - 1005px)`; // 900px + left list 100px + drag handle 5px
+            columnsContainer.classList.add('flex-nowrap');
+            columnsContainer.classList.remove('flex-wrap');
+        }
+        isExpanded = !isExpanded;  // 상태 반전
+
+        if (map) {
+            map.setSize(rightPanel.getBoundingClientRect());
+        }
+    });
+    // 마우스 업 이벤트
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.body.style.cursor = 'default';
+    });
+
+    document.addEventListener('DOMContentLoaded', adjustPanelWidth);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const stateName = /*[[${trip.city.state.stateName}]]*/ '';
+            const cityName = /*[[${trip.city.cityName}]]*/ '';
+
+            await initializeMap('map', stateName, cityName);
+            pinMarker();
+        } catch (error) {
+            console.error('실행 중 오류 발생:', error);
+        }
+    });
+
+    // function pinMarker() {
+    //     const colors = ["primary", "warning", "danger", "info", "secondary", "success"];
+    //     // 모든 schedule-container를 순회
+    //     document.querySelectorAll('.schedule-container').forEach(container => {
+    //         // 각 컨테이너 내의 모든 card를 처리
+    //         container.querySelectorAll('#locationCard').forEach(card => {
+    //             const locationX = card.querySelector('.location-x').textContent;
+    //             const locationY = card.querySelector('.location-y').textContent;
+    //             const day = parseInt(card.querySelector('.day').textContent);
+    //             const route = card.querySelector('.route').textContent;
+    //             const color = colors[(day - 1) % colors.length];
+    //
+    //             // 각 카드 내의 원형찾기
+    //             card.querySelectorAll('.rounded-circle, .position-absolute').forEach(element => {
+    //                 element.classList.add(`bg-${color}`);
+    //             });
+    //
+    //
+    //             const nextTimeCard = card.nextElementSibling;
+    //             if (nextTimeCard && nextTimeCard.id === 'timeCard') {
+    //                 // timeCard 내부 요소들 색상 변경
+    //                 nextTimeCard.querySelector('#carBar .d-flex').classList.add(`bg-${color}`);
+    //                 nextTimeCard.querySelector('#carIcon').classList.add(`text-${color}`);
+    //             }
+    //
+    //             if (locationX && locationY) {
+    //                 addMarker(parseFloat(locationX), parseFloat(locationY), parseInt(route), `text-${color}`);
+    //             }
+    //         });
+    //     });
+    // }
+
+    const themas = /*[[${themas}]]*/ [];
+    document.getElementById("nextPageBtn").addEventListener("click", function () {
+        const editModal = document.getElementById('editModal');
+        const modalContent = document.getElementById('modalContent');
+        const modalTitle = document.getElementById('myModalLabel');
+
+        modalTitle.textContent = '여행 정보 입력';
+
+        // 모달 내용 설정
+        modalContent.innerHTML = `
+            <form action='/schedule/save' id="tripForm" method="post" class="p-4">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="tripTitle" class="form-label">여행 제목</label>
+                        <input type="text" class="form-control form-control-sm" id="tripTitle" name="tripTitle" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="themaNo" class="form-label">여행 테마</label>
+                        <select name="themaNo" id="themaNo" class="form-select form-select-sm" required>
+                            <option value="">테마 선택</option>
+                            ${themas.map(thema =>
+            `<option value="${thema.themaNo}">${thema.themaName}</option>`
+        ).join('')}
+                        </select>
+                    </div>
+                </div>
+            </form>`;
+
+        // 저장 버튼 이벤트 리스너 추가
+        document.getElementById('saveButton').addEventListener('click', function saveNextModal() {
+            const form = document.getElementById('tripForm');
+            const formData = new FormData(form);
+
+            // 스케줄 데이터 수집
+            const updatedSchedules = [];
+            const scheduleContainers = document.querySelectorAll('#columns-container .schedule-container');
+
+            scheduleContainers.forEach((container, dayIndex) => {
+                const cards = container.querySelectorAll('#locationCard');
+                cards.forEach((card) => {
+                    const schedule = {
+                        scheduleNo: parseInt(card.querySelector('.schedule-no').textContent),
+                        scheduleDay: parseInt(card.querySelector('.day').textContent),
+                        scheduleRoute: parseInt(card.querySelector('.route').textContent),
+                    };
+                    updatedSchedules.push(schedule);
+                });
+            });
+
+            // 스케줄 데이터 전송
+            fetch('/schedule/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedSchedules)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        const editModalInstance = bootstrap.Modal.getInstance(editModal);
+                        editModalInstance.hide(); // 기존 모달 닫기
+
+                        const completionModal = new bootstrap.Modal(document.getElementById('completionModal'));
+                        completionModal.show();
+
+                        // FormData를 서버로 전송
+                        fetch('/schedule/save', {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    // 완료 모달 표시
+                                    const completionModal = new bootstrap.Modal(document.getElementById('completionModal'));
+                                    completionModal.show();
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                    }
+                })
+
+            document.getElementById('saveButton').removeEventListener('click', saveNextModal);
+        });
+
+        // 모달 보이기
+        const modal = new bootstrap.Modal(editModal);
+        modal.show();
+    });
+
+    document.querySelector('[data-bs-target="#editModal"]').addEventListener('click', function () {
+        const editModal = document.getElementById('editModal');
+        const modalContent = document.getElementById('modalContent');
+
+        // 홈화면에서 소요시간 카드 제거
+        const timeCards = document.querySelectorAll('#timeCard');
+        timeCards.forEach(card => card.remove());
+
+        modalContent.innerHTML = '';
+        const originalContainer = document.getElementById('columns-container');
+        const clonedContainer = originalContainer.cloneNode(true);
+
+        // 모달에서는 모든 컬럼이 보이도록 설정
+        clonedContainer.classList.add('flex-nowrap');
+        clonedContainer.classList.remove('flex-wrap');
+        clonedContainer.style.display = 'inline-flex';
+        clonedContainer.querySelectorAll('.column-item').forEach(column => {
+            column.style.display = 'block';
+        });
+
+        modalContent.appendChild(clonedContainer);
+        initializeDragAndDrop(modalContent);
+
+        // 저장 버튼 클릭 시
+        document.getElementById('saveButton').addEventListener('click', function saveEditModal() {
+            const modalScheduleContainers = document.querySelectorAll('#modalContent .schedule-container');
+            const originalScheduleContainers = document.querySelectorAll('#columns-container .schedule-container');
+
+            // 각 컬럼별로 처리
+            modalScheduleContainers.forEach((container, columnIndex) => {
+                const originalContainer = originalScheduleContainers[columnIndex];
+                const cards = container.querySelectorAll('.card');
+                originalContainer.innerHTML = ''; // 기존 내용 비우기
+
+                // 일정 카드 순서 업데이트
+                cards.forEach((card, cardIndex) => {
+                    // 넘버링 업데이트
+                    const numberCircle = card.querySelector('.rounded-circle');
+                    const daySpan = card.querySelector('.day');
+                    const routeSpan = card.querySelector('.route');
+
+                    if (numberCircle) numberCircle.textContent = cardIndex;
+                    if (daySpan) daySpan.textContent = (columnIndex + 1).toString();
+                    if (routeSpan) routeSpan.textContent = cardIndex.toString();
+
+                    // 일정 카드 복사 및 추가
+                    const clonedCard = card.cloneNode(true);
+                    originalContainer.appendChild(clonedCard);
+
+                    // 마지막 카드가 아닐 경우 소요시간 카드 추가
+                    if (cardIndex < cards.length - 1) {
+                        const timeCard = document.createElement('div');
+                        timeCard.className = 'card border-0';
+                        timeCard.id = 'timeCard';
+                        timeCard.style.height = '40px';
+                        timeCard.style.position = 'relative';
+                        timeCard.innerHTML = `
+                    <div class="d-flex align-items-start mt-0" style="height: 100%;">
+                        <div class="mt-1 position-relative d-flex flex-column align-items-center" id="carBar" style="height: 100%; width: 36px">
+                            <div class="d-flex align-items-center" style="width: 2px; height: 35px; font-size: 10px;">
+                            </div>
+                        </div>
+                        <div class="position-relative d-flex align-items-center justify-content-center" style="height: 100%;">
+                            <i class="ps-10 bi bi-car-front-fill fs-6" id="carIcon"></i>
+                        </div>
+                        <p class="p-2 duration" id="duration">45minute</p>
+                    </div>
+                `;
+                        originalContainer.appendChild(timeCard);
+                    }
+                });
+            });
+
+            pinMarker();
+            bootstrap.Modal.getInstance(editModal).hide();
+            document.getElementById('saveButton').removeEventListener('click', saveEditModal);
+        });
+
+        // 닫기 버튼은 단순히 모달을 닫고 원래 상태로 복원
+        document.querySelector('[data-bs-dismiss="modal"]').addEventListener('click', function closeModal() {
+            const originalScheduleContainers = document.querySelectorAll('#columns-container .schedule-container');
+
+            // 각 컬럼별로 원래 상태의 소요시간 카드 다시 추가
+            originalScheduleContainers.forEach((container) => {
+                const cards = container.querySelectorAll('.card');
+                cards.forEach((card, cardIndex) => {
+                    if (cardIndex < cards.length - 1) {
+                        const timeCard = document.createElement('div');
+                        timeCard.className = 'card border-0';
+                        timeCard.id = 'timeCard';
+                        timeCard.style.height = '40px';
+                        timeCard.style.position = 'relative';
+                        timeCard.innerHTML = `
+                    <div class="d-flex align-items-start mt-0" style="height: 100%;">
+                        <div class="mt-1 position-relative d-flex flex-column align-items-center" id="carBar" style="height: 100%; width: 36px">
+                            <div class="d-flex align-items-center" style="width: 2px; height: 35px; font-size: 10px;">
+                            </div>
+                        </div>
+                        <div class="position-relative d-flex align-items-center justify-content-center" style="height: 100%;">
+                            <i class="ps-10 bi bi-car-front-fill fs-6" id="carIcon"></i>
+                        </div>
+                        <p class="p-2 duration" id="duration">45minute</p>
+                    </div>
+                `;
+                        card.insertAdjacentElement('afterend', timeCard);
+                    }
+                });
+            });
+
+            document.querySelector('[data-bs-dismiss="modal"]').removeEventListener('click', closeModal);
+        });
+    });
+
+    function initializeDragAndDrop(modalContent) {
+        const cards = modalContent.querySelectorAll('#locationCard');
+        const scheduleContainers = modalContent.querySelectorAll('.schedule-container');
+        let dragStartContainer = null;
+        let dragStartIndex = null;
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('#locationCard:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function isValidDrop(draggingCard, targetContainer, afterElement) {
+            const draggingRoute = parseInt(draggingCard.querySelector('.route').textContent);
+            let targetPosition;
+
+            if (afterElement) {
+                const cards = [...targetContainer.querySelectorAll('#locationCard')];
+                targetPosition = cards.indexOf(afterElement);
+            } else {
+                targetPosition = targetContainer.querySelectorAll('#locationCard').length;
+            }
+
+            // 0번째 카드는 0번째 위치에만 드롭 가능
+            if (draggingRoute === 0 && targetPosition !== 0) {
+                return false;
+            }
+            // 다른 카드들은 0번째 위치에 드롭 불가능
+            if (draggingRoute !== 0 && targetPosition === 0) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function updateContainerStructure(container) {
+            const locationCards = Array.from(container.querySelectorAll('#locationCard'));
+            const dayNumber = parseInt(container.closest('.column-item').querySelector('.fw-bold').textContent.replace('Day ', ''));
+
+            container.innerHTML = '';
+
+            locationCards.forEach((card, index) => {
+                // 숙소 카드(0번)는 0으로 유지, 나머지는 1부터 시작
+                const routeNumber = index === 0 ? 0 : index;
+
+                // 카드 넘버링 업데이트
+                const numberCircle = card.querySelector('.rounded-circle');
+                const daySpan = card.querySelector('.day');
+                const routeSpan = card.querySelector('.route');
+
+                if (numberCircle) numberCircle.textContent = routeNumber;
+                if (daySpan) daySpan.textContent = dayNumber;
+                if (routeSpan) routeSpan.textContent = routeNumber;
+
+                // 색상 업데이트
+                const colors = ["primary", "warning", "danger", "info", "secondary", "success"];
+                let colorIndex = (dayNumber - 1) % colors.length;  // 먼저 인덱스 계산
+                const color = colors[colorIndex];  // 계산된 인덱스로 색상 선택
+
+                card.querySelectorAll('.rounded-circle, .position-absolute').forEach(element => {
+                    colors.forEach(c => element.classList.remove(`bg-${c}`));
+                    element.classList.add(`bg-${color}`);
+                });
+                container.appendChild(card);
+            });
+        }
+
+        function resetDraggedCard() {
+            const draggingCard = modalContent.querySelector('.dragging');
+            if (!draggingCard || !dragStartContainer) return;
+
+            const locationCards = [...dragStartContainer.querySelectorAll('#locationCard')];
+
+            if (dragStartIndex === 0) {
+                dragStartContainer.insertBefore(draggingCard, locationCards[0]);
+            } else if (dragStartIndex >= locationCards.length) {
+                dragStartContainer.appendChild(draggingCard);
+            } else {
+                dragStartContainer.insertBefore(draggingCard, locationCards[dragStartIndex]);
+            }
+
+            updateContainerStructure(dragStartContainer);
+        }
+
+        cards.forEach(card => {
+            card.setAttribute('draggable', 'true');
+
+            card.addEventListener('dragstart', () => {
+                card.classList.add('dragging');
+                dragStartContainer = card.closest('.schedule-container');
+                dragStartIndex = [...dragStartContainer.querySelectorAll('#locationCard')].indexOf(card);
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                modalContent.querySelectorAll('.drag-over').forEach(el =>
+                    el.classList.remove('drag-over')
+                );
+            });
+        });
+
+        scheduleContainers.forEach(container => {
+            container.addEventListener('dragover', e => {
+                e.preventDefault();
+                const draggable = modalContent.querySelector('.dragging');
+                if (!draggable) return;
+
+                const afterElement = getDragAfterElement(container, e.clientY);
+
+                if (!isValidDrop(draggable, container, afterElement)) {
+                    e.dataTransfer.dropEffect = 'none';
+                    return;
+                }
+
+                container.classList.add('drag-over');
+
+                if (afterElement) {
+                    container.insertBefore(draggable, afterElement);
+                } else {
+                    container.appendChild(draggable);
+                }
+            });
+
+            container.addEventListener('drop', e => {
+                e.preventDefault();
+                const draggable = modalContent.querySelector('.dragging');
+                if (!draggable) return;
+
+                const afterElement = getDragAfterElement(container, e.clientY);
+
+                if (!isValidDrop(draggable, container, afterElement)) {
+                    resetDraggedCard();
+                    e.stopPropagation();
+                    return false;
+                }
+
+                container.classList.remove('drag-over');
+                modalContent.querySelectorAll('.schedule-container').forEach(cont => {
+                    updateContainerStructure(cont);
+                });
+            });
+        });
+    }
+
+
+</script>
+</body>
+</html>

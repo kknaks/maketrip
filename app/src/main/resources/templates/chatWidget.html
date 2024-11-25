@@ -1,0 +1,55 @@
+<!--<div th:fragment="chat">-->
+<!--  <style>-->
+<!--    .chat-widget {-->
+<!--      position: fixed;-->
+<!--      bottom: 90px;-->
+<!--      right: 20px;-->
+<!--      z-index: 999;-->
+<!--      display: none;-->
+<!--    }-->
+<!--    .chat-messages {-->
+<!--      height: 370px;-->
+<!--      overflow-y: auto;-->
+<!--    }-->
+<!--    .system-message {-->
+<!--      color: #666;-->
+<!--      font-style: italic;-->
+<!--    }-->
+<!--  </style>-->
+
+<!--  &lt;!&ndash; 채팅 버튼 &ndash;&gt;-->
+<!--  <button-->
+<!--          class="btn btn-primary rounded-circle position-fixed bottom-0 end-0 m-4 p-3 shadow-lg"-->
+<!--          style="width: 60px; height: 60px;"-->
+<!--          onclick="toggleChat()">-->
+<!--    <i class="fas fa-comments fa-lg"></i>-->
+<!--  </button>-->
+
+<!--  &lt;!&ndash; 채팅 위젯 &ndash;&gt;-->
+<!--  <div class="chat-widget shadow" id="chatWidget">-->
+<!--    <div class="card" style="width: 350px;">-->
+<!--      <div class="card-header bg-primary text-white py-3">-->
+<!--        <h5 class="m-0">상담 채팅</h5>-->
+<!--      </div>-->
+<!--      <div class="card-body p-3 chat-messages" id="message-container">-->
+<!--      </div>-->
+<!--      <div class="card-footer bg-light border-top-0 p-3">-->
+<!--        <form id="message-form" onsubmit="sendMessage(event)">-->
+<!--          <div class="input-group">-->
+<!--            <input type="text"-->
+<!--                   class="form-control border-end-0"-->
+<!--                   placeholder="메시지를 입력하세요..."-->
+<!--                   id="message-input">-->
+<!--            <button type="submit" class="btn btn-primary">-->
+<!--              <i class="fas fa-paper-plane"></i>-->
+<!--            </button>-->
+<!--          </div>-->
+<!--        </form>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--  <script th:inline="javascript">-->
+<!--    document.currentUser = /*[[${session.loginUser}]]*/ {};-->
+<!--  </script>-->
+<!--</div>-->

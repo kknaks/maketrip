@@ -1,0 +1,116 @@
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--    <title>WebSocket Chat</title>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <style>-->
+<!--        #chat-container {-->
+<!--            width: 600px;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 20px;-->
+<!--        }-->
+<!--        #message-container {-->
+<!--            height: 400px;-->
+<!--            border: 1px solid #ccc;-->
+<!--            overflow-y: auto;-->
+<!--            margin-bottom: 10px;-->
+<!--            padding: 10px;-->
+<!--        }-->
+<!--        #message-form {-->
+<!--            display: flex;-->
+<!--            gap: 10px;-->
+<!--        }-->
+<!--        #message-input {-->
+<!--            flex-grow: 1;-->
+<!--            padding: 5px;-->
+<!--        }-->
+<!--        .system-message {-->
+<!--            color: #666;-->
+<!--            font-style: italic;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div id="chat-container">-->
+<!--    <div>-->
+<!--        <label>방 번호:</label>-->
+<!--        <select id="room-select">-->
+<!--            <option value="room1">Room 1</option>-->
+<!--            <option value="room2">Room 2</option>-->
+<!--            <option value="room3">Room 3</option>-->
+<!--        </select>-->
+<!--        <button onclick="connectToRoom()">입장</button>-->
+<!--    </div>-->
+<!--    <div id="message-container"></div>-->
+<!--    <form id="message-form" onsubmit="sendMessage(event)">-->
+<!--        <input type="text" id="message-input" placeholder="메시지를 입력하세요..."/>-->
+<!--        <button type="submit">전송</button>-->
+<!--    </form>-->
+<!--</div>-->
+
+<!--<script data-th-inline="javascript">-->
+<!--    let socket = null;-->
+<!--    const loginUser = /*[[${session.loginUser}]]*/ {};-->
+<!--    const messageContainer = document.getElementById('message-container');-->
+<!--    const messageForm = document.getElementById('message-form');-->
+<!--    const messageInput = document.getElementById('message-input');-->
+<!--    const roomSelect = document.getElementById('room-select');-->
+
+<!--    function connectToRoom() {-->
+<!--        if (socket) {-->
+<!--            socket.close();-->
+<!--        }-->
+
+<!--        const roomId = roomSelect.value;-->
+<!--        socket = new WebSocket(`ws://localhost:8888/chat?roomId=${roomId}`);-->
+
+<!--        socket.onopen = function(e) {-->
+<!--            appendMessage('시스템', '채팅방에 연결되었습니다.');-->
+<!--            messageForm.style.display = 'flex';-->
+<!--        };-->
+
+<!--        // 서버에서 메세지를 받을때-->
+<!--        socket.onmessage = function(event) {-->
+<!--            const data = JSON.parse(event.data);-->
+<!--            appendMessage(data.sender, data.message);-->
+<!--        };-->
+
+<!--        socket.onclose = function(event) {-->
+<!--            appendMessage('시스템', '연결이 종료되었습니다.');-->
+<!--            messageForm.style.display = 'none';-->
+<!--        };-->
+
+<!--        socket.onerror = function(error) {-->
+<!--            appendMessage('시스템', '오류가 발생했습니다.');-->
+<!--            console.error('WebSocket Error: ', error);-->
+<!--        };-->
+<!--    }-->
+
+<!--    function sendMessage(e) {-->
+<!--        e.preventDefault();-->
+<!--        const message = messageInput.value.trim();-->
+
+<!--        if (message && socket?.readyState === WebSocket.OPEN) {-->
+<!--            const data = {-->
+<!--                roomId: roomSelect.value,-->
+<!--                sender: loginUser.userEmail,-->
+<!--                message: message-->
+<!--            };-->
+<!--            socket.send(JSON.stringify(data));-->
+<!--            messageInput.value = '';-->
+<!--        }-->
+<!--    }-->
+
+<!--    function appendMessage(sender, message) {-->
+<!--        const messageElement = document.createElement('div');-->
+<!--        messageElement.textContent = `${sender}: ${message}`;-->
+<!--        messageElement.className = sender === '시스템' ? 'system-message' : '';-->
+<!--        messageContainer.appendChild(messageElement);-->
+<!--        messageContainer.scrollTop = messageContainer.scrollHeight;-->
+<!--    }-->
+
+<!--    // 초기에는 메시지 폼 숨기기-->
+<!--    messageForm.style.display = 'none';-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

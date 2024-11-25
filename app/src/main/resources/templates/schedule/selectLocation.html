@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+          name="viewport">
+    <title>간단한 지도 표시하기</title>
+    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=0zojwabqn9&submodules=geocoder"
+            type="text/javascript"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/mapUtils.js"></script>
+    <script src="/js/schedule/selectLocation.js"></script>
+    <script src="/js/schedule/searchLocation.js"></script>
+    <script src="/js/schedule/backToHome.js"></script>
+    <style>
+        .form-control:focus {
+            border-color: #dee2e6 !important;  /* 기본 테두리 색상 유지 */
+            box-shadow: none !important;
+            outline: 0 !important;
+        }
+
+        .hover-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid" style="height: 100vh;">
+    <div class="row" style="height: 100vh;">
+        <div class="col-4">
+            <div class="row position-relative" style="height: 100vh;">
+                <nav data-th-replace="~{schedule/selectDate :: nav}"></nav>
+                <div class="col-xl-9 " style="height: 100vh;">
+
+                    <div class="d-flex justify-content-between align-items-start p-3">
+                        <!-- 왼쪽 컨테이너: 텍스트 정보 -->
+                        <div class="flex-grow-1">
+                            <p class="fs-4 fw-bold mb-1" data-th-text="${trip.city.state.stateName} + ${trip.city.cityName}">제주도</p>
+                            <p class="text-secondary mb-1" data-th-text="${trip.startDate} +' ~ '+  ${trip.endDate}">2024-01-01 ~ 2024-02-01</p>
+                        </div>
+
+                        <!-- 오른쪽 컨테이너: 버튼 -->
+                        <div class="d-flex align-items-start">
+                            <button class="btn btn-sm bg-dark text-white ms-2"
+                                    data-bs-target="#appendMyLocation"
+                                    data-bs-toggle="collapse">접기
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6 d-flex justify-content-center mb-2">
+                                <!-- 장소선택 버튼 -->
+                                <button class="btn w-100 rounded-0 border border-top-0 border-start-0 border-end-0 border-primary"
+                                        id="showLocationListBtn"
+                                        type="button">장소선택
+                                </button>
+                            </div>
+
+                            <div class="col-md-6 d-flex justify-content-center mb-2">
+                                <!-- 장소추가 버튼 -->
+                                <button class="btn w-100 rounded-0 border border-top-0 border-start-0 border-end-0"
+                                        id="showAddLocationBtn"
+                                        type="button">장소추가
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 위치 리스트 영역 -->
+                    <div class="my-4" id="locationListDiv">
+                        <!-- 검색창 영역 -->
+                        <div class="input-group mb-3 shadow-sm focus-ring-0">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text"
+                                   class="form-control border-start-0 focus-ring-0"
+                                   placeholder="검색어를 입력하세요"
+                                   aria-label="Search">
+                        </div>
+
+                        <!-- 스크롤될 리스트 영역 -->
+                        <div style="height: calc(100vh - 250px); overflow-y: auto;">
+                            <div class="mb-2" data-th-each="location, status : ${locationList}"
+                                 data-th-object="${location}">
+                                <div class="card" style="width: 100%; height: 100px;">
+                                    <div class="card-body d-flex align-items-center justify-content-between gap-1 ">
+                                        <!-- 이미지 영역 -->
+                                        <img alt="Location Image" class="rounded me-3"
+                                             data-th-src="${location.locationPhoto} ?: '/images/logo.png'"
+                                             style="width: 70px; height: 70px; object-fit: cover;">
+
+                                        <!-- 텍스트 정보 영역 -->
+                                        <div class="d-flex flex-column" style="flex: 1;">
+                                            <h5 class="card-title mb-1" data-th-text="*{locationName}"
+                                                style="font-size: 16px;">여행지이름</h5>
+                                            <p class="card-text text-muted mb-0" data-th-text="*{locationAddr}"
+                                               style="font-size: 12px;">주소</p>
+                                        </div>
+
+                                        <!-- 버튼 영역 -->
+                                        <button id="addBtn" class="btn btn-outline-secondary btn-location d-flex justify-content-center align-items-center"
+                                                data-th-attr="data-index=${status.index}"
+                                                style="height: 60px; width: 30px;">
+                                            <i class="bi bi-plus-lg"></i>
+                                            <span class="d-none">
+                                                <span class="location-no" th:text="${location.locationNo}"></span>
+                                                <span class="location-x" th:text="${location.locationX}"></span>
+                                                <span class="location-y" th:text="${location.locationY}"></span>
+                                                <span class="location-type" th:text="${location.locationtypeNo}"></span>
+                                                <span class="thirdclass-code" th:text="${location.thirdclassCode}"></span>
+                                                <span class="city-code" th:text="${location.cityCode}"></span>
+                                                <span class="location-desc" th:text="${location.locationDesc}"></span>
+                                                <span class="location-tel" th:text="${location.locationTel}"></span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="my-1" id="addLocationDiv" style="width: 100%; overflow-y: auto; display: none;">
+                        <div class="input-group mb-3 shadow-sm">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                            <input type="text" class="form-control border-start-0" placeholder="새로운 장소를 검색해보세요" aria-label="Search">
+                        </div>
+                        <div class="d-flex justify-content-center mb-3">
+                            <div id="addLocationMap" style="width: 500px; height: 250px;" class="border rounded shadow-sm">
+                            </div>
+                        </div>
+                        <div class="mb-2" style="max-height: calc(100vh - 500px); overflow-y: auto;">
+                            <!-- 검색 결과가 여기에 표시될 것입니다 -->
+                        </div>
+                    </div>
+
+                </div>
+                <!-- 장소 추가 영역 -->
+                <div class="col-xl-8 collapse show bg-white text-white position-absolute start-100 h-100"
+                     id="appendMyLocation" style="z-index: 1; height: 100vh; overflow-y: auto;">
+                    <!-- 왼쪽 컨테이너: 텍스트 정보 -->
+                    <div class="p-3 d-flex align-items-end gap-3">
+                        <p class="fs-4 fw-bold mb-1 text-dark" data-th-text="${#lists.isEmpty(selectLoList)} ? '0' : ${#lists.size(selectLoList)}">0</p>
+                    </div>
+                    <div id="cardArea">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-8 bg-white text-primary" id="map" style="height: 100vh;"></div>
+
+        <div class="modal fade" id="locationSearchModal" tabindex="-1" aria-labelledby="locationSearchModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- 모달 헤더 -->
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="locationSearchModalLabel">장소 등록</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- 모달 바디 -->
+                    <div class="modal-body">
+                        <!-- 장소명 -->
+                        <div class="mb-3">
+                            <h5 class="location-title fw-bold"></h5>
+                        </div>
+                        <!-- 주소 정보 -->
+                        <div class="mb-3">
+                            <p class="location-address text-muted"></p>
+                        </div>
+
+                        <!-- 드롭다운 선택 -->
+                        <div class="dropdown mb-3">
+                            <button class="btn dropdown-toggle w-100" type="button" id="daySelector" data-bs-toggle="dropdown" aria-expanded="false">
+                                여행지를 분류하세요.
+                            </button>
+                            <ul class="dropdown-menu w-100">
+                                <li><span class="dropdown-item" data-value="A01010400">관광지</span></li>
+                                <li><span class="dropdown-item" data-value="A05020900">카페</span></li>
+                                <li><span class="dropdown-item" data-value="A04010900">쇼핑</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- 확인 메시지 -->
+                        <div class="text-center mt-4">
+                            <p>이 장소를 등록하시겠습니까?</p>
+                        </div>
+                    </div>
+
+                    <!-- 모달 푸터 -->
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="appendBtn" class="btn btn-primary">추가</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script data-th-inline="javascript">
+    const locationListDiv = document.getElementById("locationListDiv");
+    const addLocationDiv = document.getElementById('addLocationDiv');
+    const showLocationListBtn = document.getElementById('showLocationListBtn');
+    const showAddLocationBtn = document.getElementById('showAddLocationBtn');
+    let appendMyLocation  = document.getElementById("appendMyLocation");
+    let addBtns = locationListDiv.querySelectorAll(".btn");
+
+    let selectedItems = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const stateName = /*[[${trip.city.state.stateName}]]*/ '';
+            const cityName = /*[[${trip.city.cityName}]]*/ '';
+            selectedItems = /*[[${selectLoList}]]*/[];
+
+
+            await initializeMap('map', stateName, cityName);
+            await searchMap('addLocationMap',stateName, cityName);
+            await renderLocationCards(selectedItems);
+            await checkBtn();
+        } catch (error) {
+            console.error('실행 중 오류 발생:', error);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // 숙소선택 버튼 클릭 이벤트
+        showLocationListBtn.addEventListener('click', function() {
+            // 화면 전환
+            locationListDiv.style.display = 'block';
+            addLocationDiv.style.display = 'none';
+
+            // 버튼 스타일 변경
+            showLocationListBtn.classList.add('border-primary');
+            showAddLocationBtn.classList.remove('border-primary');
+        });
+
+        // 숙소추가 버튼 클릭 이벤트
+        showAddLocationBtn.addEventListener('click', function() {
+            // 화면 전환
+            locationListDiv.style.display = 'none';
+            addLocationDiv.style.display = 'block';
+
+            // 버튼 스타일 변경
+            showLocationListBtn.classList.remove('border-primary');
+            showAddLocationBtn.classList.add('border-primary');
+        });
+
+        // 초기 상태 설정 (locationListDiv가 보이도록)
+        locationListDiv.style.display = 'block';
+        addLocationDiv.style.display = 'none';
+        showLocationListBtn.classList.add('border-primary');
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const collapseButton = document.querySelector('[data-bs-target="#appendMyLocation"]');
+        const appendMyLocation = document.getElementById('appendMyLocation');
+
+        // collapse 이벤트 리스너 추가
+        appendMyLocation.addEventListener('show.bs.collapse', function () {
+            collapseButton.textContent = '접기';
+        });
+
+        appendMyLocation.addEventListener('hide.bs.collapse', function () {
+            collapseButton.textContent = '펼치기';
+        });
+    });
+
+    addBtns.forEach(button => {
+        button.addEventListener('click', () => {
+            makeLocationList(button);
+            modifyLocation(selectedItems);
+        });
+    });
+
+    appendMyLocation.addEventListener('click', (e) => {
+        // 버튼 또는 휴지통 아이콘이 클릭되었을 때
+        deleteMyLocation(e, selectedItems);
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const nextButton = document.getElementById("nextPageBtn"); // 버튼 선택
+        nextButton.addEventListener("click", function () {
+            // 클릭 시 수행할 작업을 여기에 작성
+            location.href = "/schedule/selectHotel";
+            // 여기에 원하는 로직 추가
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('#locationListDiv .form-control');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const locationCards = document.querySelectorAll('#locationListDiv .card');
+
+            locationCards.forEach(card => {
+                const locationName = card.querySelector('.card-title').textContent.toLowerCase();
+                const locationAddr = card.querySelector('.card-text').textContent.toLowerCase();
+
+                // 장소 이름이나 주소에 검색어가 포함되어 있는지 확인
+                if (locationName.includes(searchTerm) || locationAddr.includes(searchTerm)) {
+                    card.style.display = ''; // 보이기
+                } else {
+                    card.style.display = 'none'; // 숨기기
+                }
+            });
+        });
+
+        // 검색창 초기화 버튼 추가 (선택적)
+        const inputGroup = searchInput.parentElement;
+        const clearButton = document.createElement('span');
+        clearButton.className = 'input-group-text bg-white border-start-0 cursor-pointer';
+        clearButton.innerHTML = '<i class="bi bi-x-lg text-muted"></i>';
+        clearButton.style.cursor = 'pointer';
+        clearButton.style.display = 'none'; // 초기에는 숨김
+
+        // 입력 그룹에 클리어 버튼 추가
+        inputGroup.appendChild(clearButton);
+
+        // 입력 값이 있을 때만 클리어 버튼 표시
+        searchInput.addEventListener('input', function() {
+            clearButton.style.display = this.value ? 'flex' : 'none';
+        });
+
+        // 클리어 버튼 클릭 시 검색어 초기화 및 모든 카드 표시
+        clearButton.addEventListener('click', function() {
+            searchInput.value = '';
+            clearButton.style.display = 'none';
+            const locationCards = document.querySelectorAll('#locationListDiv .card');
+            locationCards.forEach(card => {
+                card.style.display = '';
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 검색 관련 요소 초기화
+        initializeSearch();
+
+        // 이벤트 리스너 등록
+        searchElements.input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const searchText = this.value.trim();
+                if (searchText) {
+                    performSearch(searchText);
+                }
+            }
+        });
+
+        searchElements.icon.addEventListener('click', function() {
+            const searchText = searchElements.input.value.trim();
+            if (searchText) {
+                performSearch(searchText);
+            }
+        });
+
+        searchElements.input.addEventListener('input', handleInputChange);
+        searchElements.clearButton.addEventListener('click', clearSearch);
+    });
+
+</script>
+</body>
+</html>

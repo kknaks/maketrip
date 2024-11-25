@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head data-th-replace="~{header :: head}"></head>
+<header data-th-replace="~{header :: #page-header}"></header>
+
+
+<body>
+<!-- 부트스트랩-->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!--손글씨 폰트-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+
+
+
+<style>
+  @font-face {
+    font-family: 'MaplestoryOTFBold';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/MaplestoryOTFBold.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'SBAggroB';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  .title-text {
+    font-family: 'SBAggroB', sans-serif;
+    font-size: 65px;
+    position: relative; /* typing-text의 기준점 */
+    display: inline-block; /* inline 요소로 설정 */
+  }
+
+  .typing-text {
+    display: inline-block; /* 커서와 텍스트를 함께 처리 */
+    white-space: nowrap;
+    overflow: hidden;
+    font-family: "MaplestoryOTFBold", sans-serif;
+    font-size: 2rem; /* 적절한 폰트 크기 설정 */
+  }
+
+  .cursor {
+    display: inline-block;
+    margin-left: 2px;  /* 텍스트와 커서 사이 간격 */
+    width: 3px;  /* 커서 너비 */
+    height: 1.2em;  /* 커서 높이 */
+    background-color: black;
+    vertical-align: text-top;  /* 텍스트와 수직 정렬 */
+    animation: blink 0.7s infinite;  /* 깜박임 애니메이션 적용 */
+  }
+
+  /* 깜빡이는 커서 애니메이션 */
+
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  /* 두 번째 슬라이드의 버튼 스타일 변경 */
+  #carouselReviews .carousel-control-prev-icon,
+  #carouselReviews .carousel-control-next-icon {
+    background-color: black; /* 검은색 아이콘 */
+    border-radius: 50%; /* 원형 버튼 (선택 사항) */
+  }
+
+  /* 두 번째 슬라이드 버튼 위치 조정 */
+  #carouselReviews .carousel-control-prev {
+    left: -125px; /* 버튼 위치 외부로 조정 */
+  }
+
+  #carouselReviews .carousel-control-next {
+    right: -125px; /* 버튼 위치 외부로 조정 */
+  }
+
+  @media (max-width: 768px) {
+    .typing-text {
+      font-size: 1.5rem; /* 작은 화면에서는 폰트 크기 줄임 */
+      height: 50px; /* 높이 조정 */
+      line-height: 50px; /* 수직 정렬 유지 */
+    }
+  }
+
+  .card-bestList .card {
+    width: 18rem; /* 카드 너비 고정 */
+    height: 25rem; /* 카드 높이 고정 */
+    overflow: hidden; /* 넘치는 내용 숨김 */
+    display: flex;
+    flex-direction: column; /* 내부 요소를 세로로 정렬 */
+    justify-content: space-between; /* 이미지와 본문 간 간격 유지 */
+  }
+
+  .card-bestList .card img {
+    height: 12rem; /* 이미지 높이 고정 */
+    width: 100%; /* 이미지가 카드 너비에 맞도록 */
+    object-fit: cover; /* 이미지 비율 유지하면서 크기 조정 */
+  }
+
+  .card-bestList .card-body {
+    flex-grow: 1; /* 본문 영역의 유연한 크기 조정 */
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 본문 내용을 중앙 정렬 */
+    align-items: center;
+  }
+
+  .card-bestList .card-title {
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    max-height: 2rem; /* 제목 높이 고정 */
+    overflow: hidden; /* 넘치는 텍스트 숨김 */
+    text-overflow: ellipsis; /* 넘치는 텍스트를 말줄임표로 표시 */
+    white-space: nowrap; /* 텍스트를 한 줄로 유지 */
+  }
+
+  .card-bestList .card-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+    max-height: 1.5rem; /* 본문 텍스트 높이 고정 */
+    overflow: hidden; /* 넘치는 텍스트 숨김 */
+    text-overflow: ellipsis; /* 넘치는 텍스트를 말줄임표로 표시 */
+    white-space: nowrap; /* 텍스트를 한 줄로 유지 */
+  }
+
+  .card-bestList {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4개의 열 */
+    gap: 20px; /* 카드 간 간격 */
+    max-width: 1700px; /* 전체 카드 리스트의 최대 너비 */
+    margin: 0 auto; /* 카드 리스트를 중앙 정렬 */
+
+    .container {
+      transition: all 0.5s ease-in-out;
+    }
+  }
+</style>
+
+<style>
+  .card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* 최대 2줄 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
+
+  .card-body {
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+   .card-text {
+    margin-top: 4px;
+    margin-bottom: 10px; /
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+
+  .card-text span {
+    margin-right: 10px;
+  }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center vh-99" style="margin-bottom: 200px; margin-top: 150px;">
+  <div class="row w-100">
+    <div class="col-md-6 align-items-start text-start">
+      <p class="title-text">
+        <span>기존에 경험하지 못한</span>
+        <span>새로운 여행 커뮤니티</span>
+      </p>
+      <div style="height: 60px">
+        <p class="typing-text"><span class="cursor"></span></p>
+      </div>
+      <div class="mt-4">
+        <button class="btn btn-primary me-2">나만의 일정 만들기</button>
+        <button class="btn btn-outline-secondary">여행일정 확인하기</button>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          <!-- banner 이미지가 있는 경우 -->
+          <div th:if="${bannerImages != null and not #lists.isEmpty(bannerImages)}"
+               th:each="image, iterStat : ${bannerImages}"
+               th:class="${iterStat.first} ? 'carousel-item active' : 'carousel-item'"
+               data-bs-interval="3500">
+            <img th:src="${image}" class="d-block w-100"  style="width: 550px; height: 400px;">
+          </div>
+          <!-- banner 이미지가 없는 경우 기본 이미지 표시 -->
+          <div th:if="${bannerImages == null or #lists.isEmpty(bannerImages)}"
+               class="carousel-item active"
+               data-bs-interval="3500">
+            <img th:src="${defaultImage}" class="d-block w-100">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-5">
+  <h1 class="text-center mb-4" style="font-size: 2.0rem;">제주도</h1>
+  <div id="top-board-carousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner" id="carousel-inner1">
+      <!-- 슬라이드 아이템이 동적으로 추가됩니다 -->
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#top-board-carousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#top-board-carousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</div>
+
+<div class="container mt-5">
+  <h1 class="text-center mb-4" style="font-size: 2.0rem;">서울</h1>
+  <div id="top-board-carousel2" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner" id="carousel-inner2">
+      <!-- 슬라이드 아이템이 동적으로 추가됩니다 -->
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#top-board-carousel2" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#top-board-carousel2" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</div>
+
+<div class="container mt-5" style="margin-bottom: 150px;">
+  <h1 class="text-center mb-4" style="font-size: 2.0rem;">베스트 후기 게시글</h1>
+
+  <div id="carouselReviews" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner" id="carousel-inner">
+      <!-- 슬라이드 아이템이 여기에 동적으로 추가됩니다 -->
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselReviews" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselReviews" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+  <div class="loader" style="display: none; text-align: center; margin: 20px 0;">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function fetchTopBoards2() {
+    try {
+      const response = await fetch('question/api/top-list-seoul');
+      const boardList = await response.json();
+
+      const carouselInner = document.getElementById('carousel-inner2');
+      carouselInner.innerHTML = '';
+
+      const chunkSize = 4;
+      for (let i = 0; i < boardList.length; i += chunkSize) {
+        const slideItems = boardList.slice(i, i + chunkSize);
+        const slide = document.createElement('div');
+        slide.className = `carousel-item ${i === 0 ? 'active' : ''}`;
+
+        const row = document.createElement('div');
+        row.className = 'd-flex justify-content-center gap-3';
+
+        slideItems.forEach(board => {
+          const boardItem = document.createElement('div');
+          boardItem.className = 'card text-center';
+          boardItem.style.width = '18rem';
+
+          const stateName = board.trip && board.trip.city && board.trip.city.state ? board.trip.city.state.stateName : 'default';
+          const cityName = board.trip && board.trip.city ? board.trip.city.cityName : 'default';
+          const imagePath = `/images/city/${board.stateName}/${board.stateName} ${board.cityName}.jpg`;
+
+
+          boardItem.innerHTML = `
+            <a href="/question/view?boardNo=${board.boardNo}" style="text-decoration: none; color: inherit;">
+              <img
+                src="${imagePath}"
+                alt="${board.cityName || '이미지 없음'}"
+                class="img-thumbnail"
+                style="width: 100%; height: 330px; object-fit: cover;"
+              />
+              <div class="card-body">
+                <h5 class="card-title">${board.title}</h5>
+                <div>
+                  <p class="card-text">${board.stateName || '도시 정보 없음'}</p>
+                  <p class="card-text">
+                    <span>❤️ ${board.likeCount}</span>
+                    <span>⭐ ${board.favorCount}</span>
+                    <span>👀 ${board.viewCount}</span>
+                    <span>💬 ${board.commentCount}</span>
+                  </p>
+                </div>
+              </div>
+            </a>
+          `;
+          row.appendChild(boardItem);
+        });
+
+        slide.appendChild(row);
+        carouselInner.appendChild(slide);
+      }
+    } catch (error) {
+      console.error('Error fetching top boards:', error);
+    }
+  }
+
+  fetchTopBoards2();
+</script>
+
+<script>
+  async function fetchTopBoards() {
+    try {
+      const response = await fetch('question/api/top-list');
+      const boardList = await response.json();
+
+      const carouselInner = document.getElementById('carousel-inner1');
+      carouselInner.innerHTML = '';
+
+      const chunkSize = 4;
+      for (let i = 0; i < boardList.length; i += chunkSize) {
+        const slideItems = boardList.slice(i, i + chunkSize);
+        const slide = document.createElement('div');
+        slide.className = `carousel-item ${i === 0 ? 'active' : ''}`;
+
+        const row = document.createElement('div');
+        row.className = 'd-flex justify-content-center gap-3';
+
+        slideItems.forEach(board => {
+          const boardItem = document.createElement('div');
+          boardItem.className = 'card text-center';
+          boardItem.style.width = '18rem';
+
+          const stateName = board.trip && board.trip.city && board.trip.city.state ? board.trip.city.state.stateName : 'default';
+          const cityName = board.trip && board.trip.city ? board.trip.city.cityName : 'default';
+          const imagePath = `/images/city/${board.stateName}/${board.stateName} ${board.cityName}.jpg`;
+
+
+          boardItem.innerHTML = `
+            <a href="/question/view?boardNo=${board.boardNo}" style="text-decoration: none; color: inherit;">
+              <img
+                src="${imagePath}"
+                alt="${board.cityName || '이미지 없음'}"
+                class="img-thumbnail"
+                style="width: 100%; height: 330px; object-fit: cover;"
+              />
+              <div class="card-body">
+                <h5 class="card-title">${board.title}</h5>
+                <div>
+                  <p class="card-text">${board.stateName || '도시 정보 없음'}</p>
+                  <p class="card-text">
+                    <span>❤️ ${board.likeCount}</span>
+                    <span>⭐ ${board.favorCount}</span>
+                    <span>👀 ${board.viewCount}</span>
+                    <span>💬 ${board.commentCount}</span>
+                  </p>
+                </div>
+              </div>
+            </a>
+          `;
+          row.appendChild(boardItem);
+        });
+
+        slide.appendChild(row);
+        carouselInner.appendChild(slide);
+      }
+    } catch (error) {
+      console.error('Error fetching top boards:', error);
+    }
+  }
+
+  fetchTopBoards();
+</script>
+
+<script>
+  let page = 1;
+  const carouselInner = document.getElementById('carousel-inner');
+  const loader = document.querySelector('.loader');
+
+  async function loadItems() {
+    loader.style.display = 'block';
+
+    try {
+      const response = await fetch(`/review/api/list?page=${page}`);
+      const data = await response.json();
+
+      if (data.length === 0) {
+        loader.style.display = 'none';
+        return;
+      }
+
+      // 데이터를 4개씩 슬라이드로 그룹화
+      for (let i = 0; i < data.length; i += 4) {
+        const slideItems = data.slice(i, i + 4);
+        const slide = document.createElement('div');
+        slide.className = `carousel-item ${page === 1 && i === 0 ? 'active' : ''}`;
+
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        slideItems.forEach(item => {
+          const col = document.createElement('div');
+          col.className = 'col-md-3'; // 4개씩 배치
+          col.innerHTML = `
+            <div class="card shadow-sm">
+            <a href="/review/view?boardNo=${item.boardNo}" class="stretched-link" style="text-decoration: none; color: inherit;">
+              <img src="${item.firstImageName ? `https://dgg7dnk35523.edge.naverncp.com/HZiW9aEJy7/review/${item.firstImageName}?type=u&w=150&h=150` : 'https://dgg7dnk35523.edge.naverncp.com/HZiW9aEJy7/review/default.png?type=u&w=150&h=150'}" class="card-img-top" alt="${item.boardTitle}">
+              <div class="card-body text-center">
+                <h5 class="card-title" style="max-height: 1.5rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${item.boardTitle}</h5>
+                <p class="card-text">${item.cityName}</p>
+                <p class="text-muted small">❤️ ${item.boardLike} | 👀 ${item.boardCount}</p>
+              </div>
+            </a>
+            </div>
+          `;
+          row.appendChild(col);
+        });
+
+        slide.appendChild(row);
+        carouselInner.appendChild(slide);
+      }
+
+      loader.style.display = 'none';
+      page++;
+    } catch (error) {
+      console.error('Error fetching review list:', error);
+      loader.style.display = 'none';
+    }
+  }
+
+  // 초기 로드
+  loadItems();
+</script>
+
+<script>
+  // title-text와 typing-text 요소의 너비를 동기화
+  window.addEventListener("load", function () {
+    const typingText = document.querySelector(".typing-text");
+    const parentWidth = typingText.parentElement.offsetWidth;
+
+    // 부모 너비에 맞게 조정
+    typingText.style.width = `${parentWidth}px`;
+  });
+</script>
+
+<!-- 타이핑 텍스트-->
+<script src="/js/typingText.js"></script>
+</body>
+</html>
