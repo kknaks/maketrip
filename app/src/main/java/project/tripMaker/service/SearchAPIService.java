@@ -27,8 +27,6 @@ public class SearchAPIService {
   private String clientSecret;
 
   private final String BASE_URL = "https://openapi.naver.com/v1/search/local.json";
-//  private final String clientId = "vvcE5GftCUO4WxBGC52I"; //애플리케이션 클라이언트 아이디
-//  private final String clientSecret = "HFm7bQSO3f"; //애플리케이션 클라이언트 시크릿
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   // 공통 API 요청 메서드

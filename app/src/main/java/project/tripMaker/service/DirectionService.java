@@ -25,8 +25,6 @@ public class DirectionService {
 
   @Value("${direction.api.key}")
   private String API_KEY;
-//  private final String API_KEY_ID = "0zojwabqn9";
-//  private final String API_KEY = "mtgHl2KSLnNK03kqcBAYe6TpMD4DsWGVHstoRpvA";
   private final String BASE_URL = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving";
   private final ObjectMapper objectMapper = new ObjectMapper();
 
