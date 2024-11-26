@@ -173,7 +173,7 @@
 
             // 초기 WebSocket 연결 설정
             if (!globalSocket || globalSocket.readyState !== WebSocket.OPEN) {
-                globalSocket = new WebSocket(`ws://localhost:8888/ws/chat?userId=${user1Id}&roomId=global`);
+                globalSocket = new WebSocket(`ws://175.45.194.22:80/ws/chat?userId=${user1Id}&roomId=global`);
 
                 globalSocket.onopen = function() {
                     console.log('WebSocket Connected on page load');
@@ -490,7 +490,7 @@
                 return;
             }
 
-            globalSocket = new WebSocket(`ws://localhost:8888/ws/chat?userId=${user1Id}&roomId=${room.roomId}`);
+            globalSocket = new WebSocket(`ws://175.45.194.22:80/ws/chat?userId=${user1Id}&roomId=${room.roomId}`);
 
             globalSocket.onopen = function() {
                 console.log('WebSocket Connected');
