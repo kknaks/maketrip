@@ -2,6 +2,7 @@ package project.tripMaker.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import project.tripMaker.vo.City;
 import project.tripMaker.vo.Location;
@@ -17,14 +18,11 @@ import java.util.List;
 @Service
 public class TourAPIService {
 
-  private final String apiKey =
-          "XnvCfqp1B9c3utiwpFbA7r1fL/VB+ajinxxnfzDqa9hYdr4tHh1sf0WUcxbFXSyK1HSCHQ3Llk6QLVRC9yMJ2g==";
+  @Value("${tour.api.key}")
+  private String apiKey;  // 필드로 선언
+//  private final String apiKey =
+//          "XnvCfqp1B9c3utiwpFbA7r1fL/VB+ajinxxnfzDqa9hYdr4tHh1sf0WUcxbFXSyK1HSCHQ3Llk6QLVRC9yMJ2g==";
   private final ObjectMapper objectMapper = new ObjectMapper();
-
-  public static void main(String[] args) {
-    TourAPIService tourAPIService = new TourAPIService();
-    tourAPIService.stateList();
-  }
 
   // 공통 API 요청 메서드
   private JsonNode requestApi(String requestURL, String params) throws Exception {

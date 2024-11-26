@@ -3,6 +3,7 @@ package project.tripMaker.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import project.tripMaker.vo.RouteInfo;
@@ -18,8 +19,14 @@ import java.util.List;
 @Data
 @Service
 public class DirectionService {
-  private final String API_KEY_ID = "0zojwabqn9";
-  private final String API_KEY = "mtgHl2KSLnNK03kqcBAYe6TpMD4DsWGVHstoRpvA";
+
+  @Value("${direction.api.key.id}")
+  private String API_KEY_ID;
+
+  @Value("${direction.api.key}")
+  private String API_KEY;
+//  private final String API_KEY_ID = "0zojwabqn9";
+//  private final String API_KEY = "mtgHl2KSLnNK03kqcBAYe6TpMD4DsWGVHstoRpvA";
   private final String BASE_URL = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving";
   private final ObjectMapper objectMapper = new ObjectMapper();
 

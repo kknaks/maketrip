@@ -2,6 +2,7 @@ package project.tripMaker.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import project.tripMaker.vo.City;
 import project.tripMaker.vo.Location;
@@ -19,9 +20,15 @@ import java.util.Map;
 @Service
 public class SearchAPIService {
 
+  @Value("${naver.api.client.id}")
+  private String clientId;
+
+  @Value("${naver.api.client.secret}")
+  private String clientSecret;
+
   private final String BASE_URL = "https://openapi.naver.com/v1/search/local.json";
-  private final String clientId = "vvcE5GftCUO4WxBGC52I"; //애플리케이션 클라이언트 아이디
-  private final String clientSecret = "HFm7bQSO3f"; //애플리케이션 클라이언트 시크릿
+//  private final String clientId = "vvcE5GftCUO4WxBGC52I"; //애플리케이션 클라이언트 아이디
+//  private final String clientSecret = "HFm7bQSO3f"; //애플리케이션 클라이언트 시크릿
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   // 공통 API 요청 메서드

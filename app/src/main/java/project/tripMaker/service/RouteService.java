@@ -18,10 +18,6 @@ public class RouteService {
 
     int maxLocationsPerDay = (int) Math.ceil((double) tourismCount / accommodationCount);
 
-    System.out.println("====================================================");
-    System.out.println("==================================숙소 갯수 : " + accommodationCount);
-    System.out.println("일별 최대 관광지 수: " + maxLocationsPerDay);
-
     List<List<Integer>> assignments = new ArrayList<>(accommodationCount);
     for (int i = 0; i < accommodationCount; i++) {
       assignments.add(new ArrayList<>());
