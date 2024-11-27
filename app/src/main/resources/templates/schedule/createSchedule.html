@@ -31,8 +31,7 @@
 <body>
 <div class="d-flex" style="width: 100%; height: 100vh;">
     <!-- 왼쪽 리스트 부분 -->
-    <nav class="p-2 text-center "
-         style="width: 100px; flex: 0 0 100px;">
+    <nav class="p-2 text-center d-flex flex-column justify-content-between" style="width: 100px; flex: 0 0 100px;">
         <div>
             <h4 class="text-dark text-center">
                 <a href="#" class="text-decoration-none text-dark" id="homeLink">모두의<br>여행</a>
@@ -46,16 +45,15 @@
                 </li>
             </ul>
         </div>
-        <div class="d-flex mb-4">
-            <div class="d-flex flex-column align-items-center mt-4">
-                <div class="mb-2">
-                    <button class="btn btn-primary btn-sm" data-bs-target="#editModal" data-bs-toggle="modal" type="button">
-                        일정 편집
-                    </button>
-                </div>
-                <div>
-                    <button class="btn btn-primary btn-sm" id="nextPageBtn" type="button">다음</button>
-                </div>
+
+        <div class="d-flex flex-column align-items-center mb-4">
+            <div class="mb-2">
+                <button class="btn btn-primary btn-sm" data-bs-target="#editModal" data-bs-toggle="modal" type="button">
+                    일정 편집
+                </button>
+            </div>
+            <div>
+                <button class="btn btn-primary btn-sm" id="nextPageBtn" type="button">다음</button>
             </div>
         </div>
 

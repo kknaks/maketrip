@@ -38,7 +38,8 @@
       <div class="menu-group">
         <h3 class="menu-heading">게시판</h3>
         <ul class="menu-list">
-          <li><a href="/mypage/boardpage" data-th-classappend="${#httpServletRequest.requestURI == '/mypage/boardpage' ? 'active' : ''}">게시글 목록</a></li>
+          <li><a href="/mypage/questionpage" data-th-classappend="${#httpServletRequest.requestURI == '/mypage/questionpage' ? 'active' : ''}">질문 목록</a></li>
+          <li><a href="/mypage/reviewpage" data-th-classappend="${#httpServletRequest.requestURI == '/mypage/reviewpage' ? 'active' : ''}">후기 목록</a></li>
           <li><a href="/mypage/commentpage" data-th-classappend="${#httpServletRequest.requestURI == '/mypage/commentpage' ? 'active' : ''}">댓글 목록</a></li>
         </ul>
       </div>
@@ -59,6 +60,7 @@
           <div data-th-each="trip, iterStat : ${trips}"
                data-th-if="${iterStat.index < 3}"
                class="col-md-4 mb-4">
+            <a data-th-href="@{/mypage/view(tripNo=${trip.tripNo})}" class="trip-link" style="text-decoration: none; color: black;">
             <div class="trip-card">
               <div class="card-img-wrapper">
                 <img data-th-with="cityPhoto=${'/images/city/' + trip.city?.state?.stateName + '/' + trip.city?.state?.stateName + ' ' + trip.city?.cityName + '.jpg'}"
@@ -87,6 +89,7 @@
                 </div>
               </div>
             </div>
+            </a>
           </div>
         </div>
       </div>

@@ -18,11 +18,15 @@
         <result property="boardTag" column="board_tag"/>
         <result property="boardLike" column="like_count"/>
         <result property="boardFavor" column="favor_count"/>
+        <result property="boardFavor" column="favor_count"/>
+        <result property="firstImageName" column="boardimage_name"/>
 
         <!-- Trip 및 City 정보 매핑 -->
         <association property="trip" javaType="project.tripMaker.vo.Trip">
             <id property="tripNo" column="trip_no"/>
             <result property="tripTitle" column="trip_title"/>
+            <result property="startDate" column="start_date"/>
+            <result property="endDate" column="end_date"/>
             <association property="city" javaType="project.tripMaker.vo.City">
                <result property="cityName" column="city_name"/>
                 <association property="state" javaType="project.tripMaker.vo.State">
@@ -198,6 +202,8 @@
       COALESCE(fv.favor_count, 0) AS favor_count,
       COALESCE(bl.like_count, 0) AS like_count,
       t.trip_title,
+    t.start_date,
+    t.end_date,
       th.thema_name,             <!-- Thema Name 추가 -->
       cy.city_name, -- 시도명
       s.state_name, -- 주 이름 추가
@@ -505,6 +511,8 @@
     COALESCE(fv.favor_count, 0) AS favor_count,
     COALESCE(bl.like_count, 0) AS like_count,
     t.trip_title,
+    t.start_date,
+    t.end_date,
     th.thema_name,             <!-- Thema Name 추가 -->
     cy.city_name, -- 시도명
     s.state_name, -- 주 이름 추가
@@ -555,6 +563,8 @@
     COALESCE(fv.favor_count, 0) AS favor_count,
     COALESCE(bl.like_count, 0) AS like_count,
     t.trip_title,
+    t.start_date,
+    t.end_date,
     th.thema_name,             <!-- Thema Name 추가 -->
     cy.city_name, -- 시도명
     s.state_name, -- 주 이름 추가
@@ -581,7 +591,7 @@
     b.boardtype_no = 3
     AND u.user_nickname LIKE CONCAT('%', #{writer}, '%')
     ORDER BY
-    b.board_created_date DESC, b.board_no DESC,
+    b.board_created_date DESC, b.board_no DESC
   </select>
 
   <!--태그검색-->
@@ -605,6 +615,8 @@
     COALESCE(fv.favor_count, 0) AS favor_count,
     COALESCE(bl.like_count, 0) AS like_count,
     t.trip_title,
+    t.start_date,
+    t.end_date,
     th.thema_name,             <!-- Thema Name 추가 -->
     cy.city_name, -- 시도명
     s.state_name, -- 주 이름 추가
@@ -653,6 +665,8 @@
     COALESCE(fv.favor_count, 0) AS favor_count,
     COALESCE(bl.like_count, 0) AS like_count,
     t.trip_title,
+    t.start_date,
+    t.end_date,
     th.thema_name,             <!-- Thema Name 추가 -->
     cy.city_name, -- 시도명
     s.state_name, -- 주 이름 추가
@@ -702,6 +716,8 @@
     COALESCE(fv.favor_count, 0) AS favor_count,
     COALESCE(bl.like_count, 0) AS like_count,
     t.trip_title,
+    t.start_date,
+    t.end_date,
     th.thema_name,             <!-- Thema Name 추가 -->
     cy.city_name, -- 시도명
     s.state_name, -- 주 이름 추가

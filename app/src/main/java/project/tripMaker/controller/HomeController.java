@@ -4,13 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import java.io.IOException;
-import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +19,7 @@ public class HomeController {
   private String resourceLocation;
 
   private static final String DEFAULT_IMAGE =
-      "https://dgg7dnk35523.edge.naverncp.com/HZiW9aEJy7/review/default.png?type=u&w=600&h=400";
+      "https://dgg7dnk35523.edge.naverncp.com/HZiW9aEJy7/review/default.png?type=u&w=550&h=480";
 
   @GetMapping("/home")
   public String home(Model model) {
@@ -59,30 +57,6 @@ public class HomeController {
       e.printStackTrace();
     }
 
-    try {
-      String serverIp = "Unknown";
-      Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-
-      while (interfaces.hasMoreElements()) {
-        NetworkInterface ni = interfaces.nextElement();
-        Enumeration<InetAddress> addresses = ni.getInetAddresses();
-
-        while (addresses.hasMoreElements()) {
-          InetAddress addr = addresses.nextElement();
-          if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-            serverIp = addr.getHostAddress();
-            break;
-          }
-        }
-        if (!serverIp.equals("Unknown")) {
-          break;
-        }
-      }
-
-      model.addAttribute("serverIp", serverIp);
-    } catch (SocketException e) {
-      e.printStackTrace();
-    }
     model.addAttribute("defaultImage", DEFAULT_IMAGE);
 
     return "home";

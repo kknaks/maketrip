@@ -1,43 +1,27 @@
 package project.tripMaker.controller;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.tripMaker.dto.ReviewDto;
 import project.tripMaker.service.CommentService;
 import project.tripMaker.service.ReviewService;
 import project.tripMaker.service.ScheduleService;
 import project.tripMaker.service.StorageService;
-import project.tripMaker.vo.Board;
-import project.tripMaker.vo.BoardImage;
-import project.tripMaker.vo.Comment;
-import project.tripMaker.vo.Schedule;
-import project.tripMaker.vo.Trip;
-import project.tripMaker.vo.User;
+import project.tripMaker.vo.*;
+
+import javax.servlet.http.HttpSession;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/review")
@@ -306,7 +290,15 @@ public class ReviewController {
         .collect(Collectors.groupingBy(Schedule::getScheduleDay));
     model.addAttribute("groupedSchedules", groupedSchedules);
 
+    Trip trip = board.getTrip();
+    LocalDate startDate = trip.getStartDate().toLocalDate();
 
+    Map<Integer, String> dayDates = groupedSchedules.keySet().stream()
+        .collect(Collectors.toMap(
+            day -> day,
+            day -> startDate.plusDays(day - 1).format(DateTimeFormatter.ofPattern("yyyy.MM.dd(E)"))
+        ));
+    model.addAttribute("dayDates", dayDates);
 
     model.addAttribute("board", board);
     model.addAttribute("commentList", commentList);
@@ -575,17 +567,8 @@ public class ReviewController {
     return "review/list"; // 게시글 목록을 출력하는 Thymeleaf 템플릿 파일 이름
   }
 
-  // @GetMapping("api/list")
-  // public ResponseEntity<List<ReviewDto>> getReviewList(@RequestParam int page) {
-  //   try {
-  //     List<ReviewDto> reviews = reviewService.getReviews(page);
-  //     return new ResponseEntity<>(reviews, HttpStatus.OK);
-  //   } catch (Exception e) {
-  //     e.printStackTrace();
-  //     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
 
+  // 베스트 후기 리스트 가져오기
   @GetMapping("api/list")
   public ResponseEntity<List<ReviewDto>> getTopRecommendedBoards(@RequestParam int page) {
     try {
@@ -613,6 +596,7 @@ public class ReviewController {
             .writerNickname(board.getWriter().getUserNickname())
             .writerPhoto(board.getWriter().getUserPhoto())
             .boardCreatedDate(createdDate)
+            .commentCount(board.getCommentCount())
             .build();
       }).collect(Collectors.toList());
 
