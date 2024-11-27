@@ -10,10 +10,6 @@ build
 # Ignore Gradle build output directory
 build
 
-# ignore for bitcamp-project main git push
-*.properties
-
-
 # gitIgnore Auto Settings
 # Created by https://www.toptal.com/developers/gitignore/api/gradle,java,intellij,eclipse,windows,macos,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=gradle,java,intellij,eclipse,windows,macos,linux
