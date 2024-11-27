@@ -174,7 +174,7 @@
 
             // 초기 WebSocket 연결 설정
             if (!globalSocket || globalSocket.readyState !== WebSocket.OPEN) {
-                globalSocket = new WebSocket(`ws://223.130.147.91/ws/chat?userId=${user1Id}&roomId=global`);
+                globalSocket = new WebSocket(`ws://modu.everytrip.n-e.kr//ws/chat?userId=${user1Id}&roomId=global`);
 
                 globalSocket.onopen = function() {
                     console.log('WebSocket Connected on page load');
@@ -491,7 +491,7 @@
                 return;
             }
 
-            globalSocket = new WebSocket(`ws://223.130.147.91/ws/chat?userId=${user1Id}&roomId=${room.roomId}`);
+            globalSocket = new WebSocket(`ws://modu.everytrip.n-e.kr//ws/chat?userId=${user1Id}&roomId=${room.roomId}`);
             globalSocket.onopen = function() {
                 console.log('WebSocket Connected');
                 loadChatRooms();
