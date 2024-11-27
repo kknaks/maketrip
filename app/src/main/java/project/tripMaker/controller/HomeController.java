@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,12 +60,29 @@ public class HomeController {
     }
 
     try {
-      String serverIp = InetAddress.getLocalHost().getHostAddress();
+      String serverIp = "Unknown";
+      Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+
+      while (interfaces.hasMoreElements()) {
+        NetworkInterface ni = interfaces.nextElement();
+        Enumeration<InetAddress> addresses = ni.getInetAddresses();
+
+        while (addresses.hasMoreElements()) {
+          InetAddress addr = addresses.nextElement();
+          if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
+            serverIp = addr.getHostAddress();
+            break;
+          }
+        }
+        if (!serverIp.equals("Unknown")) {
+          break;
+        }
+      }
+
       model.addAttribute("serverIp", serverIp);
-    } catch (UnknownHostException e) {
+    } catch (SocketException e) {
       e.printStackTrace();
     }
-
     model.addAttribute("defaultImage", DEFAULT_IMAGE);
 
     return "home";
