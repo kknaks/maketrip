@@ -27,7 +27,8 @@ public class HomeController {
 
     try {
       // resourceLocation에서 이미 file: 포함되어 있으므로 static은 제거
-      Path bannerPath = Paths.get(resourceLocation.replace("classpath:", ""), "images", "banner");
+      String resourcePath = resourceLocation.replace("file:", "").replace("classpath:", "");
+      Path bannerPath = Paths.get(resourcePath, "images", "banner");
 
       // 디버깅용 로그
       System.out.println("Resource Location: " + resourceLocation);

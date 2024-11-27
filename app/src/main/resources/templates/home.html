@@ -11,145 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
-
-
-<style>
-  @font-face {
-    font-family: 'MaplestoryOTFBold';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/MaplestoryOTFBold.woff') format('woff');
-    font-weight: 300;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'SBAggroB';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  .title-text {
-    font-family: 'SBAggroB', sans-serif; !important;
-    font-size: 65px; !important;
-    position: relative; /* typing-text의 기준점 */ !important;
-    display: inline-block; /* inline 요소로 설정 */ !important;
-  }
-
-  .typing-text {
-    display: inline-block; /* 커서와 텍스트를 함께 처리 */ !important;
-    white-space: nowrap; !important;
-    overflow: hidden; !important;
-    font-family: "MaplestoryOTFBold", sans-serif; !important;
-    font-size: 2rem; /* 적절한 폰트 크기 설정 */ !important;
-  }
-
-  .cursor {
-    display: inline-block; !important;
-    margin-left: 2px;  /* 텍스트와 커서 사이 간격 */ !important;
-    width: 3px;  /* 커서 너비 */ !important;
-    height: 1.2em;  /* 커서 높이 */ !important;
-    background-color: black; !important;
-    vertical-align: text-top;  /* 텍스트와 수직 정렬 */ !important;
-    animation: blink 0.7s infinite;  /* 깜박임 애니메이션 적용 */ !important;
-  }
-
-  /* 깜빡이는 커서 애니메이션 */
-
-  @keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-
-  @media (max-width: 768px) {
-    .typing-text {
-      font-size: 1.5rem; /* 작은 화면에서는 폰트 크기 줄임 */
-      height: 50px; /* 높이 조정 */
-      line-height: 50px; /* 수직 정렬 유지 */
-    }
-  }
-
-</style>
-
-<style>
-  .card-title {
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* 최대 2줄 */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: normal;
-  }
-
-  .card-body {
-    height: 150px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-   .card-text {
-    margin-top: 4px;
-    margin-bottom: 10px; /
-    letter-spacing: 0.5px;
-    text-align: center;
-  }
-
-  .card-text span {
-    margin-right: 10px;
-  }
-
-  .animated-title {
-    color: #333;
-    font-size: 36px;
-    font-weight: bold;
-    padding: 20px 0;
-    text-align: center;
-    margin-bottom: 20px;
-    font-family: 'SBAggroB', sans-serif;
-  }
-
-  .location-text {
-    display: inline-block;
-    color: #fff;
-    padding: 4px 12px;
-    transition: all 0.5s ease;
-  }
-
-  .jeju { background: #4ec7f3; }
-  .seoul { background: #42c58a; }
-  .best { background: #DC143C; }
-
-  .carousel-item {
-    transition: transform .6s ease-in-out;
-  }
-
-  .card {
-    transition: transform .3s;
-  }
-
-  .card:hover {
-    transform: translateY(-5px);
-  }
-
-  /* 캐러셀 인디케이터 스타일링 */
-  .carousel-indicators {
-    bottom: -50px;
-  }
-
-  .carousel-indicators button {
-    background-color: #999 !important;
-    height: 10px !important;
-    width: 10px !important;
-    border-radius: 50%;
-    margin: 0 5px;
-  }
-
-  .carousel-indicators .active {
-    background-color: #333 !important;
-  }
-</style>
-
+<link data-th-href="@{/css/home.css}" rel="stylesheet">
 
 <div class="container d-flex justify-content-center align-items-center vh-99" style="margin-bottom: 200px; margin-top: 150px;">
   <div class="row w-100">
@@ -362,7 +224,13 @@
         style="width: 100%; height: 330px; object-fit: cover;"
       />
       <div class="card-body">
-        <h5 class="card-title">${title}</h5>
+        <h6 class="card-title" style="
+   font-weight: bold;
+   white-space: nowrap; /* 한 줄로 표시 */
+   overflow: hidden;    /* 넘치는 내용 숨김 */
+   text-overflow: ellipsis; /* 넘칠 경우 ... 표시 */
+   display: block;      /* 블록 레벨 요소로 표시 */
+">${title}</h6>
         <div>
           <p class="card-text">${location}</p>
           <p class="card-text">

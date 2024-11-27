@@ -4,7 +4,6 @@
 <head data-th-replace="~{header :: head}"></head>
 <header data-th-replace="~{header :: #page-header}"></header>
 <link data-th-href="@{/css/review.css}" rel="stylesheet">
-<h1 class="text-center mb-4">여행 후기 게시판</h1>
 
 <body>
 <!--SweetAlert2-->
@@ -34,6 +33,12 @@
 
 <!-- 게시글이 있는 경우 -->
 <div class="container my-5" style="max-width: 1200px; margin: 0 auto;">
+    <div class="container text-center my-4">
+        <h1 class="custom-title">
+            <span class="highlight">여행후기</span> 게시판
+        </h1>
+    </div>
+
     <form id="myForm" data-th-action="@{modify}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="boardNo" data-th-value="${board.boardNo}">
         <div class="mb-3" id="top">
@@ -260,7 +265,7 @@
 
 
 <!-- 네비게이션 버튼 -->
-<div id="navButtons" class="btn-group-vertical" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+<div id="navButtons" class="btn-group-vertical" style="position: fixed; bottom: 20px; right: 130px; z-index: 1000;">
     <button id="scrollTopButton" class="btn btn-secondary btn-sm">
         <i class="bi bi-arrow-up"></i> 상단으로 이동
     </button>
@@ -489,7 +494,7 @@
         try {
             // 지도초기화
             await initializeMap("map", stateName, cityName);
-ㅊ
+
             // addMarker(126.545219, 33.524923);
             const locationInfos = document.querySelectorAll('#review-location');
             console.log(locationInfos);
