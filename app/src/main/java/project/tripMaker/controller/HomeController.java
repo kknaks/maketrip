@@ -5,9 +5,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.io.IOException;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,13 @@ public class HomeController {
 
     } catch (IOException e) {
       System.out.println("Error reading banner directory: " + e.getMessage());
+      e.printStackTrace();
+    }
+
+    try {
+      String serverIp = InetAddress.getLocalHost().getHostAddress();
+      model.addAttribute("serverIp", serverIp);
+    } catch (UnknownHostException e) {
       e.printStackTrace();
     }
 

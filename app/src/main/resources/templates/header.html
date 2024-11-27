@@ -57,6 +57,7 @@
                 <a class="navbar-brand" href="/">
                     <img data-th-src="@{/images/logo.png}" class="ms-5" style="width: 200px; height: 80px" alt="Logo">
                 </a>
+                <span th:text="'서버 IP: ' + ${serverIp}"></span>
             </li>
 
 
@@ -162,21 +163,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        fetch('https://ipapi.co/json/')
-            .then(response => response.json())
-            .then(data => {
-                // IP를 표시할 요소 생성
-                const ipElement = document.createElement('span');
-                ipElement.textContent = `접속 IP: ${data.ip}`;
-                ipElement.className = 'text-muted ms-2';
-
-                // fram-topbanner 클래스를 가진 요소 아래에 추가
-                document.querySelector('.fram-topbanner').appendChild(ipElement);
-            })
-            .catch(error => console.error('IP 가져오기 실패:', error));
-    </script>
 
     <script data-th-inline="javascript">
 
