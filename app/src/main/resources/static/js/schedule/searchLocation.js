@@ -188,7 +188,7 @@ function initializeModalOnce() {
                 cityCode: card.querySelector('.city-code').textContent,
                 locationDesc: card.querySelector('.location-desc').textContent,
                 locationTel: card.querySelector('.location-tel').textContent,
-                // locationPhoto: "card.querySelector('.location-photo').textContent"
+                locationPhoto: '/images/logo.png'
                 // locationPhoto: card.querySelector('.location-photo').textContent
             };
 

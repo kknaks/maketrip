@@ -94,10 +94,11 @@ public class TourAPIService {
 
   public List<Location> showLocation(City city) {
     try {
+      System.out.println(city.toString()+"=========================================");
       String requestURL = "https://apis.data.go.kr/B551011/KorService1/areaBasedList1";
       String params = String.format(
               "numOfRows=10&pageNo=1&MobileOS=ETC&MobileApp=MobileApp&_type=json&listYN=Y&arrange=O&contentTypeId=12&areaCode=%s&sigunguCode=%s",
-              city.getState().getStateTour(), city.getCityTour());
+              city.getState().getStateTour(), city.getCityTour()==0? "" : city.getCityTour());
       JsonNode itemsNode =
               requestApi(requestURL, params).path("response").path("body").path("items").path("item");
 
@@ -129,7 +130,7 @@ public class TourAPIService {
       String requestURL = "https://apis.data.go.kr/B551011/KorService1/areaBasedList1";
       String params = String.format(
               "numOfRows=10&pageNo=1&MobileOS=ETC&MobileApp=MobileApp&_type=json&listYN=Y&arrange=O&contentTypeId=32&areaCode=%s&sigunguCode=%s",
-              city.getState().getStateTour(), city.getCityTour());
+              city.getState().getStateTour(), city.getCityTour()==0? "" : city.getCityTour());
       JsonNode itemsNode =
               requestApi(requestURL, params).path("response").path("body").path("items").path("item");
 

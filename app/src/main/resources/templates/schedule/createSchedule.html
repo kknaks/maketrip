@@ -53,7 +53,7 @@
                 </button>
             </div>
             <div>
-                <button class="btn btn-primary btn-sm" id="nextPageBtn" type="button">다음</button>
+                <button class="btn btn-primary btn-sm" id="nextPageBtn" type="button">저장 하기</button>
             </div>
         </div>
 
@@ -104,16 +104,18 @@
                                 <div class="d-flex align-items-start gap-1 mt-1" style="height: 100%;">
                                     <div class="position-relative d-flex flex-column align-items-center"
                                          style="height: 100%;">
+
                                         <div class="m-2 d-flex justify-content-center align-items-center rounded-circle text-white"
-                                             data-th-text="${schedule.scheduleRoute}"
+                                             data-th-utext="${schedule.scheduleRoute == 0 ? '<i class=&quot;bi bi-house-door&quot;></i>' : schedule.scheduleRoute}"
                                              style="width: 20px; height: 20px; font-size: 10px;">
                                         </div>
+
                                         <div class="position-absolute"
                                              style="width: 2px; height: calc(100% - 20px); top: 30px; left: 50%; transform: translateX(-50%);">
                                         </div>
                                     </div>
                                     <div class="d-flex flex-column align-items-start mt-2">
-                                        <p class="mb-0 bg-info rounded text-white p-1" style="font-size: 12px;">관광명소</p>
+                                        <p class="mb-0 bg-info rounded text-white p-1" style="font-size: 12px;" data-th-text="${schedule.scheduleRoute == 0 ? '숙박시설' : '관광명소'}">관광명소</p>
                                         <p class="fs-6 fw-bold mb-0" th:text="${schedule.location.locationName}">
                                             관광지이름</p>
                                     </div>
@@ -536,7 +538,7 @@
             // 각 컬럼별로 처리
             modalScheduleContainers.forEach((container, columnIndex) => {
                 const originalContainer = originalScheduleContainers[columnIndex];
-                const cards = container.querySelectorAll('.card');
+                const cards = container.querySelectorAll('#locationCard');
                 originalContainer.innerHTML = ''; // 기존 내용 비우기
 
                 // 일정 카드 순서 업데이트
@@ -546,7 +548,13 @@
                     const daySpan = card.querySelector('.day');
                     const routeSpan = card.querySelector('.route');
 
-                    if (numberCircle) numberCircle.textContent = cardIndex;
+                    if (numberCircle) {
+                        if (cardIndex === 0) {
+                            numberCircle.innerHTML = '<i class="bi bi-house-door"></i>';
+                        } else {
+                            numberCircle.textContent = cardIndex;
+                        }
+                    }
                     if (daySpan) daySpan.textContent = (columnIndex + 1).toString();
                     if (routeSpan) routeSpan.textContent = cardIndex.toString();
 
@@ -562,17 +570,17 @@
                         timeCard.style.height = '40px';
                         timeCard.style.position = 'relative';
                         timeCard.innerHTML = `
-                    <div class="d-flex align-items-start mt-0" style="height: 100%;">
-                        <div class="mt-1 position-relative d-flex flex-column align-items-center" id="carBar" style="height: 100%; width: 36px">
-                            <div class="d-flex align-items-center" style="width: 2px; height: 35px; font-size: 10px;">
-                            </div>
-                        </div>
-                        <div class="position-relative d-flex align-items-center justify-content-center" style="height: 100%;">
-                            <i class="ps-10 bi bi-car-front-fill fs-6" id="carIcon"></i>
-                        </div>
-                        <p class="p-2 duration" id="duration">45minute</p>
-                    </div>
-                `;
+                   <div class="d-flex align-items-start mt-0" style="height: 100%;">
+                       <div class="mt-1 position-relative d-flex flex-column align-items-center" id="carBar" style="height: 100%; width: 36px">
+                           <div class="d-flex align-items-center" style="width: 2px; height: 35px; font-size: 10px;">
+                           </div>
+                       </div>
+                       <div class="position-relative d-flex align-items-center justify-content-center" style="height: 100%;">
+                           <i class="ps-10 bi bi-car-front-fill fs-6" id="carIcon"></i>
+                       </div>
+                       <p class="p-2 duration" id="duration">45minute</p>
+                   </div>
+               `;
                         originalContainer.appendChild(timeCard);
                     }
                 });
@@ -582,6 +590,61 @@
             bootstrap.Modal.getInstance(editModal).hide();
             document.getElementById('saveButton').removeEventListener('click', saveEditModal);
         });
+        //
+        // // 저장 버튼 클릭 시
+        // document.getElementById('saveButton').addEventListener('click', function saveEditModal() {
+        //     const modalScheduleContainers = document.querySelectorAll('#modalContent .schedule-container');
+        //     const originalScheduleContainers = document.querySelectorAll('#columns-container .schedule-container');
+        //
+        //     // 각 컬럼별로 처리
+        //     modalScheduleContainers.forEach((container, columnIndex) => {
+        //         const originalContainer = originalScheduleContainers[columnIndex];
+        //         const cards = container.querySelectorAll('.card');
+        //         originalContainer.innerHTML = ''; // 기존 내용 비우기
+        //
+        //         // 일정 카드 순서 업데이트
+        //         cards.forEach((card, cardIndex) => {
+        //             // 넘버링 업데이트
+        //             const numberCircle = card.querySelector('.rounded-circle');
+        //             const daySpan = card.querySelector('.day');
+        //             const routeSpan = card.querySelector('.route');
+        //
+        //             if (numberCircle) numberCircle.textContent = cardIndex;
+        //             if (daySpan) daySpan.textContent = (columnIndex + 1).toString();
+        //             if (routeSpan) routeSpan.textContent = cardIndex.toString();
+        //
+        //             // 일정 카드 복사 및 추가
+        //             const clonedCard = card.cloneNode(true);
+        //             originalContainer.appendChild(clonedCard);
+        //
+        //             // 마지막 카드가 아닐 경우 소요시간 카드 추가
+        //             if (cardIndex < cards.length - 1) {
+        //                 const timeCard = document.createElement('div');
+        //                 timeCard.className = 'card border-0';
+        //                 timeCard.id = 'timeCard';
+        //                 timeCard.style.height = '40px';
+        //                 timeCard.style.position = 'relative';
+        //                 timeCard.innerHTML = `
+        //             <div class="d-flex align-items-start mt-0" style="height: 100%;">
+        //                 <div class="mt-1 position-relative d-flex flex-column align-items-center" id="carBar" style="height: 100%; width: 36px">
+        //                     <div class="d-flex align-items-center" style="width: 2px; height: 35px; font-size: 10px;">
+        //                     </div>
+        //                 </div>
+        //                 <div class="position-relative d-flex align-items-center justify-content-center" style="height: 100%;">
+        //                     <i class="ps-10 bi bi-car-front-fill fs-6" id="carIcon"></i>
+        //                 </div>
+        //                 <p class="p-2 duration" id="duration">45minute</p>
+        //             </div>
+        //         `;
+        //                 originalContainer.appendChild(timeCard);
+        //             }
+        //         });
+        //     });
+        //
+        //     pinMarker();
+        //     bootstrap.Modal.getInstance(editModal).hide();
+        //     document.getElementById('saveButton').removeEventListener('click', saveEditModal);
+        // });
 
         // 닫기 버튼은 단순히 모달을 닫고 원래 상태로 복원
         document.querySelector('[data-bs-dismiss="modal"]').addEventListener('click', function closeModal() {
@@ -675,8 +738,14 @@
                 const numberCircle = card.querySelector('.rounded-circle');
                 const daySpan = card.querySelector('.day');
                 const routeSpan = card.querySelector('.route');
-
-                if (numberCircle) numberCircle.textContent = routeNumber;
+                if (numberCircle) {
+                    if (routeNumber === 0) {
+                        numberCircle.innerHTML = '<i class="bi bi-house-door"></i>';
+                    } else {
+                        numberCircle.textContent = routeNumber;
+                    }
+                }
+                // if (numberCircle) numberCircle.textContent = routeNumber;
                 if (daySpan) daySpan.textContent = dayNumber;
                 if (routeSpan) routeSpan.textContent = routeNumber;
 

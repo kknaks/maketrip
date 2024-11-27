@@ -110,7 +110,7 @@ function addMarker(locationX, locationY, index, textColor) {
                 <div class="position-relative d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
                     <i class="position-absolute bottom-0 bi bi-geo-alt-fill ${textColor}" style="font-size: 36px;"></i>
                     <div class="position-absolute top-0 d-flex justify-content-center align-items-center rounded-circle bg-white text-dark fw-bold" style="width: 20px; height: 20px; font-size: 15px;">
-                        ${index}
+                        ${index === 0 ? '<i class="bi bi-house-door-fill"></i>' : index}
                     </div>
                 </div>
             `,
@@ -121,6 +121,28 @@ function addMarker(locationX, locationY, index, textColor) {
     markerList.push(marker);
     return marker;
 }
+
+// function addMarker(locationX, locationY, index, textColor) {
+//     let pos = new naver.maps.LatLng(locationY, locationX);
+//     let marker = new naver.maps.Marker({
+//         position: pos,
+//         map: map,
+//         icon: {
+//             content: `
+//                 <div class="position-relative d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+//                     <i class="position-absolute bottom-0 bi bi-geo-alt-fill ${textColor}" style="font-size: 36px;"></i>
+//                     <div class="position-absolute top-0 d-flex justify-content-center align-items-center rounded-circle bg-white text-dark fw-bold" style="width: 20px; height: 20px; font-size: 15px;">
+//                         ${index}
+//                     </div>
+//                 </div>
+//             `,
+//             size: new naver.maps.Size(100, 100),
+//             anchor: new naver.maps.Point(12, 30)
+//         }
+//     });
+//     markerList.push(marker);
+//     return marker;
+// }
 
 // 마커 제거 함수
 function removeMarker(locationX, locationY) {
