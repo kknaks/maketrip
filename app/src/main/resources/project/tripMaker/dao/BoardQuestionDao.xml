@@ -230,6 +230,7 @@
         b.board_tag,
         u.user_no,
         u.user_nickname,
+        u.user_photo,
         COALESCE(fv.favor_count, 0) AS favor_count,
         COALESCE(bl.like_count, 0) AS like_count,
         c.city_name, -- 시도명
@@ -266,6 +267,7 @@
         b.board_tag,
         u.user_no,
         u.user_nickname,
+        u.user_photo,
         COALESCE(fv.favor_count, 0) AS favor_count,
         COALESCE(bl.like_count, 0) AS like_count,
         c.city_name, -- 시도명
@@ -302,6 +304,7 @@
         b.board_tag,
         u.user_no,
         u.user_nickname,
+        u.user_photo,
         COALESCE(fv.favor_count, 0) AS favor_count,
         COALESCE(bl.like_count, 0) AS like_count,
         c.city_name, -- 시도명
