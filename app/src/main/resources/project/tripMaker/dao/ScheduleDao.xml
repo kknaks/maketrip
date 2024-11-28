@@ -356,6 +356,7 @@
             SELECT 1
             FROM board b
             WHERE b.trip_no = t.trip_no
+              AND b.boardtype_no = 3 -- boardtype_no = 3 조건 추가
         );
     </select>
 </mapper>

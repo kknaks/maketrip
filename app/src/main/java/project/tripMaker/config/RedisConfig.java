@@ -10,7 +10,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import project.tripMaker.listener.ChatMessageListener;
 
-//@Configuration
+@Configuration
 public class RedisConfig {
 
   @Bean

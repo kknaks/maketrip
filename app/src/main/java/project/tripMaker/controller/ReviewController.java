@@ -373,6 +373,7 @@ public class ReviewController {
       @RequestParam("boardNo") Integer boardNo,
       @RequestParam("title") String title,
       @RequestParam("content") String content,
+      @RequestParam("boardTag") String boardTag,
       @RequestParam(value = "deletedImages", required = false) String deletedImages,
       @RequestParam(value = "imageFiles", required = false) MultipartFile[] files
   ) throws Exception {
@@ -381,6 +382,7 @@ public class ReviewController {
       Board board = reviewService.get(boardNo);
       board.setBoardTitle(title);
       board.setBoardContent(content);
+      board.setBoardTag(boardTag);
 
       if (files == null) {
         files = new MultipartFile[0];

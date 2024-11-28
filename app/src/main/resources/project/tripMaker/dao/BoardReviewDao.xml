@@ -249,7 +249,8 @@
         board
     set
         board_title=#{boardTitle},
-        board_content=#{boardContent}
+        board_content=#{boardContent},
+        board_tag=#{boardTag}
     where
         board_no=#{boardNo}
   </update>
