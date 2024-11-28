@@ -163,6 +163,14 @@
                 `;
                 scheduleContainer.appendChild(entry);
             });
+
+            // **여기서 높이 강제 설정**
+            const locationTexts = document.querySelectorAll('.location-text');
+            locationTexts.forEach(p => {
+                p.style.height = '2.4em'; // 두 줄 높이로 고정
+                p.style.lineHeight = '1.2em'; // 줄 간격 설정
+            });
+
         } else {
             scheduleContainer.innerHTML = '<p class="text-danger">일정 데이터가 없습니다.</p>';
         }
