@@ -13,7 +13,6 @@
 <script src="https://kit.fontawesome.com/ecaa6a7d50.js" crossorigin="anonymous"></script>
 <!-- Bootstrap JS 및 종속성 -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <!--Naver MAP API-->
 <script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=0zojwabqn9&submodules=geocoder"></script>
 <script data-th-src="@{/js/mapUtils.js}"></script>
@@ -359,7 +358,6 @@
         });
     }
 
-    // 좋아요 토글 함수
     function toggleLike(boardNo) {
         const isLoggedIn = [[${isLoggedIn}]];
 
@@ -378,53 +376,39 @@
                 return response.json().then(result => ({status: response.ok, data: result}));
             })
             .then(({status, data}) => {
+                Swal.fire({
+                    toast: true,
+                    icon: status ? 'success' : 'error',
+                    title: status ? '좋아요가 변경되었습니다.' : '좋아요 처리 중 오류 발생',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true,
+                    customClass: {
+                        container: 'position-absolute',
+                    },
+                    didOpen: (toast) => {
+                        const toastContainer = toast.parentElement;
+
+                        // 한뼘 정도 대각선 아래 설정 (예: 100px x 100px)
+                        toastContainer.style.position = 'absolute';
+                        toastContainer.style.top = `10px`; // 화면 시작점에서 아래로 100px
+                        toastContainer.style.left = `100px`; // 화면 시작점에서 오른쪽으로 100px
+                    }
+                });
+
+                // UI 업데이트
                 if (status) {
-                    // UI 업데이트: 좋아요 버튼 및 카운트 변경
                     const likeButton = document.getElementById('likeButton');
-                    const likeCount = document.getElementById('likeCount');
-
                     likeButton.textContent = data.isLiked ? '❤️ 좋아요 취소' : '🤍 좋아요';
-                    likeCount.textContent = data.likeCount;
-
-                    // 성공 토스트 메시지
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-start',
-                        icon: 'success',
-                        title: '좋아요가 추가 되었습니다.',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        timerProgressBar: true,
-                    });
-                } else {
-                    // 오류 토스트 메시지
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-start',
-                        icon: 'error',
-                        title: result.message || '좋아요 처리 중 오류가 발생했습니다.',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        timerProgressBar: true,
-                    });
+                    document.getElementById('likeCount').textContent = data.likeCount;
                 }
             })
             .catch(error => {
                 console.error('좋아요 요청 실패:', error);
-                // alert('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
-                // 네트워크 오류 토스트 메시지
-                Swal.fire({
-                    toast: true,
-                    position: 'top-start',
-                    icon: 'error',
-                    title: '네트워크 오류가 발생했습니다. 다시 시도해 주세요.',
-                    showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true,
-                });
             });
         }
     }
+
 
     // 즐겨찾기 토글 함수
     function toggleFavor(boardNo) {
@@ -445,53 +429,38 @@
                 return response.json().then(result => ({status: response.ok, data: result}));
             })
             .then(({status, data}) => {
+                Swal.fire({
+                    toast: true,
+                    icon: status ? 'success' : 'error',
+                    title: status ? '즐겨찾기가 변경되었습니다.' : '즐겨찾기 처리 중 오류 발생',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true,
+                    customClass: {
+                        container: 'position-absolute',
+                    },
+                    didOpen: (toast) => {
+                        const toastContainer = toast.parentElement;
+
+                        // 한뼘 정도 대각선 아래 설정 (예: 100px x 100px)
+                        toastContainer.style.position = 'absolute';
+                        toastContainer.style.top = `100px`; // 화면 시작점에서 아래로 100px
+                        toastContainer.style.left = `100px`; // 화면 시작점에서 오른쪽으로 100px
+                    }
+                });
+
+                // UI 업데이트
                 if (status) {
-                    // UI 업데이트: 좋아요 버튼 및 카운트 변경
                     const favorButton = document.getElementById('favorButton');
-                    const favorCount = document.getElementById('favorCount');
-
                     favorButton.textContent = data.isFavored ? '⭐ 즐겨찾기 취소' : '⚪ 즐겨찾기';
-                    favorCount.textContent = data.favorCount;
-
-                    // 성공 토스트 메시지
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-start',
-                        icon: 'success',
-                        title: '즐겨찾기 상태가 변경되었습니다.',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        timerProgressBar: true,
-                    });
-                } else {
-                    // 오류 토스트 메시지
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-start',
-                        icon: 'error',
-                        title: data.message || '즐겨찾기 처리 중 오류가 발생했습니다.',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        timerProgressBar: true,
-                    });
+                    document.getElementById('favorCount').textContent = data.favorCount;
                 }
             })
             .catch(error => {
                 console.error('즐겨찾기 요청 실패:', error);
-                // 네트워크 오류 토스트 메시지
-                Swal.fire({
-                    toast: true,
-                    position: 'top-start',
-                    icon: 'error',
-                    title: '네트워크 오류가 발생했습니다. 다시 시도해 주세요.',
-                    showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true,
-                });
             });
         }
     }
-
     document.addEventListener('DOMContentLoaded', async () => {
         console.log(document.querySelectorAll('#review-location').length);
 

@@ -452,7 +452,7 @@
 
     <select id="searchBoards" resultMap="BoardMap">
         SELECT
-        @rownum := @rownum + 1 AS tmp_no,  -- 가상 번호 부여
+            @rownum := @rownum + 1 AS tmp_no,  -- 가상 번호 부여
         b.board_no,
         b.board_title,
         b.board_created_date,
@@ -462,27 +462,31 @@
         u.user_no,
         u.user_nickname,
         u.user_photo,
+        th.thema_name,
         COALESCE(fv.favor_count, 0) AS favor_count,
         COALESCE(bl.like_count, 0) AS like_count,
-        c.city_name
+        c.city_name,
+        s.state_name
         FROM
-        (SELECT @rownum := 0) r,  -- 변수 초기화
-        board b
-        LEFT OUTER JOIN user u ON b.user_no = u.user_no
-        LEFT JOIN favor_count_view fv ON b.board_no = fv.board_no
-        LEFT JOIN boardlike_count_view bl ON b.board_no = bl.board_no
-        LEFT JOIN trip t ON b.trip_no = t.trip_no
-        LEFT JOIN city c ON t.city_code = c.city_code
+            (SELECT @rownum := 0) r,  -- 변수 초기화
+            board b
+            LEFT OUTER JOIN user u ON b.user_no = u.user_no
+            LEFT JOIN favor_count_view fv ON b.board_no = fv.board_no
+            LEFT JOIN boardlike_count_view bl ON b.board_no = bl.board_no
+            LEFT JOIN trip t ON b.trip_no = t.trip_no
+            LEFT JOIN city c ON t.city_code = c.city_code
+            LEFT JOIN state s ON c.state_code = s.state_code
+            LEFT JOIN thema th ON t.thema_no = th.thema_no
         WHERE
-        b.boardtype_no = 1
-        AND (b.board_title LIKE CONCAT('%', #{search}, '%') -- 제목
-        OR b.board_content LIKE CONCAT('%', #{search}, '%') -- 내용
-        OR u.user_nickname LIKE CONCAT('%', #{search}, '%') -- 닉네임
-        OR c.city_name LIKE CONCAT('%', #{search}, '%')) -- 장소
+            b.boardtype_no = 1
+          AND (b.board_title LIKE CONCAT('%', #{search}, '%') -- 제목
+           OR b.board_content LIKE CONCAT('%', #{search}, '%') -- 내용
+           OR u.user_nickname LIKE CONCAT('%', #{search}, '%') -- 닉네임
+           OR c.city_name LIKE CONCAT('%', #{search}, '%')) -- 장소
         ORDER BY
-        b.board_no DESC
-        LIMIT
-        #{rowNo}, #{length}
+            b.board_no DESC
+            LIMIT
+            #{rowNo}, #{length}
     </select>
 
     <select id="searchBoardCount" resultType="int">
