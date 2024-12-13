@@ -43,10 +43,6 @@ Etc
 <img src="https://img.shields.io/badge/Visual Studio-5C2D91?style=flat&logo=Visual Studio&logoColor=white">
 ![68747470733a2f2f696d672e736869656c64732e696f2f62616467652f506f73746d616e2d4646364333373f7374796c653d666c6174266c6f676f3d506f73746d616e266c6f676f436f6c6f723d7768697465](https://user-images.githubusercontent.com/116135174/224563871-9ccb51f3-1be2-45d0-ab1f-e4d792e049dd.svg)
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)
-- 적용기술 및 패턴
-    1) **Network** : Sever Class와 Client Class를 각각 생성하여 Socket을 data 통한 통신
-    2) **Thread** : 게임 생성 및 게임 진행을 Thread을 통한 실행으로 독립적인 게임 기능 구현
-    3) **Observer 패턴** : 앱 실행 및 종료 시 객체에게 알림 기능 추가
 
 ## 아키텍처
 <img width="1057" alt="image" src="https://github.com/user-attachments/assets/4ec601a3-9178-41fa-807e-adbe3429dd73">
